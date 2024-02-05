@@ -3,6 +3,7 @@ using HouseRentingAPI.Configuration;
 using HouseRentingAPI.Constract;
 using HouseRentingAPI.Controllers;
 using HouseRentingAPI.Data;
+using HouseRentingAPI.Interface;
 using HouseRentingAPI.Service;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,10 +30,21 @@ builder.Services.AddCors(options =>
     });
 });
 
+//Authorizaion
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("LandlordPolicy", policy =>
+    {
+        policy.RequireRole("Landlord");
+    });
+});
+
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 builder.Services.AddScoped<UsersController>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericService<>));
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<LandlordsController>();
+builder.Services.AddScoped<ILandlordService, LandLordService>();
 
 var app = builder.Build();
 

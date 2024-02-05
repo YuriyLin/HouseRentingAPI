@@ -6,76 +6,75 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HouseRentingAPI.Data;
-using HouseRentingAPI.Model;
 using AutoMapper;
-using HouseRentingAPI.Constract;
-using System.Diagnostics.Metrics;
+using HouseRentingAPI.Interface;
+using HouseRentingAPI.Model;
 
 namespace HouseRentingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class LandlordsController : ControllerBase
     {
         private readonly HouseRentingDbContext _context;
         private readonly IMapper _mapper;
-        private readonly IUserService _userService;
+        private readonly ILandlordService _landlordService;
 
-        public UsersController(HouseRentingDbContext context, IMapper mapper, IUserService userService)
+        public LandlordsController(HouseRentingDbContext context,IMapper mapper,ILandlordService landlordService)
         {
-            this._context = context;
+            _context = context;
             this._mapper = mapper;
-            this._userService = userService;
+            this._landlordService = landlordService;
         }
 
-        // get all user information
+        // GET: api/Landlords
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetUserDto>>> GetUser()
+        public async Task<ActionResult<IEnumerable<GetLandlordDto>>> GetLandlord()
         {
-            var user = await _userService.GetAllAsync();
-            var record = _mapper.Map<List<GetUserDto>>(user);
+            var landlord = await _landlordService.GetAllAsync();
+            var record = _mapper.Map<List<GetLandlordDto>>(landlord);
             return Ok(record);
         }
 
-        // get user all information by Id
+        // get landlord all information by Id
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<GetUserByIdDto>>> GetUserById(Guid id)
+        public async Task<ActionResult<IEnumerable<GetLandlordByIdDto>>> GetLandlordById(Guid id)
         {
-            var user = await _userService.GetAsync(id);
+            var landlord = await _landlordService.GetAsync(id);
 
-            if (user == null)
+            if (landlord == null)
             {
                 return NotFound();
             }
 
-            return Ok(user);
+            return Ok(landlord);
         }
 
-        //Update User Data
+        //Update Landlord Data
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(Guid id, UpdateUserDto updateUserDto)
+        public async Task<IActionResult> UpdateLandlord(Guid id,  UpdateLandlordDto updateLandlordDto)
         {
-            if (id != updateUserDto.Id)
+            if (id != updateLandlordDto.LandlordID)
             {
                 return BadRequest("Invalid Record Id");
             }
 
-            var user = await _userService.GetAsync(id);
+            var landlord = await _landlordService.GetAsync(id);
 
-            if (user == null)
+            if (landlord == null)
             {
                 return NotFound();
             }
 
-            _mapper.Map(updateUserDto, user);
+            _mapper.Map(updateLandlordDto, landlord);
 
             try
             {
-                await _userService.UpdateAsync(user);
+                await _landlordService.UpdateAsync(landlord);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await UserExists(id))
+                if (!await LandlordExists(id))
                 {
                     return NotFound();
                 }
@@ -88,39 +87,39 @@ namespace HouseRentingAPI.Controllers
             return Ok(new { Message = "資料已更新" });
         }
 
-        //user password update
+        //landlord password update
         [HttpPut("update-password/{id}")]
-        public async Task<IActionResult> UpdateUserPassword(Guid id, UpdateUserPasswordDto updateuserPasswordDto)
+        public async Task<IActionResult> UpdateLandlordPassword(Guid id,  UpdateLandlordPasswordDto updateLandlordPasswordDto)
         {
-            var user = await _userService.GetAsync(id);
+            var landlord = await _landlordService.GetAsync(id);
 
-            if (user == null)
+            if (landlord == null)
             {
                 return NotFound();
             }
 
             // 檢查舊密碼是否正確
-            if (user.Password != updateuserPasswordDto.OldPassword)
+            if (landlord.Password != updateLandlordPasswordDto.OldPassword)
             {
                 return BadRequest(new { Message = "舊密碼不正確" });
             }
 
             // 檢查新密碼和確認新密碼是否一致
-            if (updateuserPasswordDto.NewPassword != updateuserPasswordDto.ConfirmNewPassword)
+            if (updateLandlordPasswordDto.NewPassword != updateLandlordPasswordDto.ConfirmNewPassword)
             {
                 return BadRequest(new { Message = "密碼不一致" });
             }
 
             // 更新密碼
-            user.Password = updateuserPasswordDto.NewPassword;
+            landlord.Password = updateLandlordPasswordDto.NewPassword;
 
             try
             {
-                await _userService.UpdateAsync(user);
+                await _landlordService.UpdateAsync(landlord);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await UserExists(id))
+                if (!await LandlordExists(id))
                 {
                     return NotFound();
                 }
@@ -133,20 +132,19 @@ namespace HouseRentingAPI.Controllers
             return Ok(new { Message = "密碼已更新" });
         }
 
-        //User Register
         [HttpPost("register")]
-        public IActionResult UserRegister([FromBody] UserRegisterDto userRegisterDto)
+        public IActionResult UserRegister([FromBody]  LandlordRegisterDto landlordRegisterDto)
         {
             if (ModelState.IsValid)
             {
                 // 檢查是否已經存在相同的學號（StuId）
-                if (_context.User.Any(u => u.StuId == userRegisterDto.StuId))
+                if (_context.Landlords.Any(u => u.Phone == landlordRegisterDto.Phone))
                 {
                     return BadRequest(new { Message = "學號已被使用" });
                 }
 
-                var user = _mapper.Map<User>(userRegisterDto);
-                _context.User.Add(user);
+                var landlord = _mapper.Map<Landlord>(landlordRegisterDto);
+                _context.Landlords.Add(landlord);
                 _context.SaveChanges();
 
                 return Ok(new { Message = "註冊成功" });
@@ -156,19 +154,18 @@ namespace HouseRentingAPI.Controllers
                 return BadRequest(ModelState);
             }
         }
-
-        //User Login
+        // POST: api/Landlords
         [HttpPost("login")]
-        public IActionResult UserLogin([FromBody] UserLoginDto userLoginDto)
+        public IActionResult UserLogin([FromBody]  LandlordLoginDto landlordLoginDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var user = _context.User.FirstOrDefault(u => u.StuId == userLoginDto.StuId && u.Password == userLoginDto.Password);
+            var landlord = _context.Landlords.FirstOrDefault(u => u.Phone == landlordLoginDto.Phone && u.Password == landlordLoginDto.Password);
 
-            if (user != null)
+            if (landlord != null)
             {
                 // 登入成功，可以返回一個Token或其他身份驗證信息
                 return Ok(new { Message = "登入成功" });
@@ -180,24 +177,24 @@ namespace HouseRentingAPI.Controllers
             }
         }
 
-        //Delete User
+        // DELETE: api/Landlords/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(Guid id)
+        public async Task<IActionResult> DeleteLandlord(Guid id)
         {
-            var user = await _userService.GetAsync(id);
-            if (user == null)
+            var landlord = await _landlordService.GetAsync(id);
+            if (landlord == null)
             {
                 return NotFound();
             }
 
-            await _userService.DeleteAsync(id);
+            await _landlordService.DeleteAsync(id);
 
-            return Ok(new { Message = "該用戶已刪除" });
+            return Ok(new { Message = "房東資料已刪除" });
         }
 
-        private async Task<bool> UserExists(Guid id)
+        private async Task<bool> LandlordExists(Guid id)
         {
-            return await _userService.Exists(id);
-        }       
+            return await _landlordService.Exists(id);
+        }
     }
 }
