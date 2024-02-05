@@ -89,7 +89,7 @@ namespace HouseRentingAPI.Controllers
         }
 
         //user password update
-        [HttpPut("update-password/{id}")]
+        [HttpPut("updatepassword/{id}")]
         public async Task<IActionResult> UpdateUserPassword(Guid id, UpdateUserPasswordDto updateuserPasswordDto)
         {
             var user = await _userService.GetAsync(id);
@@ -170,7 +170,6 @@ namespace HouseRentingAPI.Controllers
 
             if (user != null)
             {
-                // 登入成功，可以返回一個Token或其他身份驗證信息
                 return Ok(new { Message = "登入成功" });
             }
 

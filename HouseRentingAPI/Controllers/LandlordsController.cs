@@ -88,7 +88,7 @@ namespace HouseRentingAPI.Controllers
         }
 
         //landlord password update
-        [HttpPut("update-password/{id}")]
+        [HttpPut("updatepassword/{id}")]
         public async Task<IActionResult> UpdateLandlordPassword(Guid id,  UpdateLandlordPasswordDto updateLandlordPasswordDto)
         {
             var landlord = await _landlordService.GetAsync(id);
@@ -137,10 +137,10 @@ namespace HouseRentingAPI.Controllers
         {
             if (ModelState.IsValid)
             {
-                // 檢查是否已經存在相同的學號（StuId）
+                // 檢查是否已經存在相同的手機號碼
                 if (_context.Landlords.Any(u => u.Phone == landlordRegisterDto.Phone))
                 {
-                    return BadRequest(new { Message = "學號已被使用" });
+                    return BadRequest(new { Message = "該號碼已被使用" });
                 }
 
                 var landlord = _mapper.Map<Landlord>(landlordRegisterDto);
@@ -167,7 +167,6 @@ namespace HouseRentingAPI.Controllers
 
             if (landlord != null)
             {
-                // 登入成功，可以返回一個Token或其他身份驗證信息
                 return Ok(new { Message = "登入成功" });
             }
 

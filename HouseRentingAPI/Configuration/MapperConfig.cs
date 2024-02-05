@@ -23,6 +23,11 @@ namespace HouseRentingAPI.Configuration
             CreateMap<Landlord, UpdateLandlordDto>().ReverseMap();
             CreateMap<Landlord, UpdateLandlordPasswordDto>().ReverseMap();
 
+            CreateMap<House, HouseAddDto>().ReverseMap();
+            CreateMap<House, UpdateHouseDto>().ReverseMap();
+            CreateMap<House, GetHouseDto>().ReverseMap();
+            CreateMap<House, GetHouseByIdDto>().ReverseMap();
+            
         }
     }
 }

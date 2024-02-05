@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HouseRentingAPI.Data;
 using Microsoft.AspNetCore.Authorization;
+using AutoMapper;
+using HouseRentingAPI.Interface;
+using HouseRentingAPI.Model;
 
 namespace HouseRentingAPI.Controllers
 {
@@ -16,52 +19,77 @@ namespace HouseRentingAPI.Controllers
     public class HousesController : ControllerBase
     {
         private readonly HouseRentingDbContext _context;
+        private readonly IMapper _mapper;
+        private readonly IHouseService _houseService;
 
-        public HousesController(HouseRentingDbContext context)
+        public HousesController(HouseRentingDbContext context, IMapper mapper, IHouseService houseService)
         {
             _context = context;
+            _mapper = mapper;
+            _houseService = houseService;
         }
 
         // GET: api/Houses
+        [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<House>>> GetHouses()
+        public async Task<ActionResult<IEnumerable<GetHouseDto>>> GetHouses()
         {
-            return await _context.Houses.ToListAsync();
+            var houses = await _houseService.GetAllAsync();
+            var record = _mapper.Map<List<GetHouseDto>>(houses);
+            return Ok(record);
         }
 
         // GET: api/Houses/5
+        [AllowAnonymous]
         [HttpGet("{id}")]
-        public async Task<ActionResult<House>> GetHouse(Guid id)
+        public async Task<ActionResult<GetHouseByIdDto>> GetHouseById(Guid id)
         {
-            var house = await _context.Houses.FindAsync(id);
+            var house = await _houseService.GetAsync(id);
 
             if (house == null)
             {
                 return NotFound();
             }
 
-            return house;
+            return Ok(house);
+        }
+
+        // POST: api/Houses
+        [HttpPost]
+        public async Task<ActionResult<HouseAddDto>> CreateHouse(HouseAddDto houseAddDto)
+        {
+            var house = _mapper.Map<House>(houseAddDto);
+            _context.Houses.Add(house);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetHouseById", new { id = house.HouseID }, _mapper.Map<GetHouseByIdDto>(house));
         }
 
         // PUT: api/Houses/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutHouse(Guid id, House house)
+        public async Task<IActionResult> UpdateHouse(Guid id, UpdateHouseDto updateHouseDto)
         {
-            if (id != house.HouseID)
+            if (id != updateHouseDto.HouseID)
             {
-                return BadRequest();
+                return BadRequest("Invalid Record Id");
             }
 
-            _context.Entry(house).State = EntityState.Modified;
+            var house = await _houseService.GetAsync(id);
+
+            if (house == null)
+            {
+                return NotFound();
+            }
+
+            _mapper.Map(updateHouseDto, house);
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _houseService.UpdateAsync(house);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!HouseExists(id))
+                if (!await HouseExists(id))
                 {
                     return NotFound();
                 }
@@ -71,39 +99,27 @@ namespace HouseRentingAPI.Controllers
                 }
             }
 
-            return NoContent();
-        }
-
-        // POST: api/Houses
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<House>> PostHouse(House house)
-        {
-            _context.Houses.Add(house);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetHouse", new { id = house.HouseID }, house);
+            return Ok(new { Message = "資料已更新" });
         }
 
         // DELETE: api/Houses/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteHouse(Guid id)
         {
-            var house = await _context.Houses.FindAsync(id);
+            var house = await _houseService.GetAsync(id);
             if (house == null)
             {
                 return NotFound();
             }
 
-            _context.Houses.Remove(house);
-            await _context.SaveChangesAsync();
+            await _houseService.DeleteAsync(id);
 
-            return NoContent();
+            return Ok(new { Message = "房屋資料已刪除" });
         }
 
-        private bool HouseExists(Guid id)
+        private async Task<bool> HouseExists(Guid id)
         {
-            return _context.Houses.Any(e => e.HouseID == id);
+            return await _houseService.Exists(id);
         }
     }
 }

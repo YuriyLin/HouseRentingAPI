@@ -45,6 +45,8 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericService<>
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<LandlordsController>();
 builder.Services.AddScoped<ILandlordService, LandLordService>();
+builder.Services.AddScoped<HousesController>();
+builder.Services.AddScoped<IHouseService, HouseService>();
 
 var app = builder.Build();
 
