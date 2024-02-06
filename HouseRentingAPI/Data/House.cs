@@ -11,6 +11,7 @@ namespace HouseRentingAPI.Data
         public Guid PropertyTypeID { get; set; }
         public int Price { get; set; }
         public int Distance { get; set; }
+        public string Description { get; set; }
         [Required]
         public string HouseName { get; set; }
         [Required]

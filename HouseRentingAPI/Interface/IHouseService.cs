@@ -5,5 +5,6 @@ namespace HouseRentingAPI.Interface
 {
     public interface IHouseService:IGenericRepository<House>
     {
+        Task<List<House>> SearchHouses(string keyword);
     }
 }

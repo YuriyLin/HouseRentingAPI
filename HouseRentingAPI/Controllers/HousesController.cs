@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using HouseRentingAPI.Interface;
 using HouseRentingAPI.Model;
+using System.ComponentModel.DataAnnotations;
 
 namespace HouseRentingAPI.Controllers
 {
@@ -52,6 +53,21 @@ namespace HouseRentingAPI.Controllers
             }
 
             return Ok(house);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("Search")]
+        public async Task<ActionResult<IEnumerable<GetHouseDto>>> SearchHouses([FromQuery][Required] string keyword)
+        {
+            try
+            {
+                var result = await _houseService.SearchHouses(keyword);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         // POST: api/Houses
