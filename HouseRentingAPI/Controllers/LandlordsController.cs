@@ -37,6 +37,7 @@ namespace HouseRentingAPI.Controllers
         }
 
         // get landlord all information by Id
+        // GET: api/Landlords/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<GetLandlordByIdDto>>> GetLandlordById(Guid id)
         {
@@ -50,7 +51,8 @@ namespace HouseRentingAPI.Controllers
             return Ok(landlord);
         }
 
-        //Update Landlord Data
+        // Update Landlord Data
+        // PUT: api/Landlords/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateLandlord(Guid id,  UpdateLandlordDto updateLandlordDto)
         {
@@ -87,7 +89,8 @@ namespace HouseRentingAPI.Controllers
             return Ok(new { Message = "資料已更新" });
         }
 
-        //landlord password update
+        // landlord password update
+        // PUT: api/Landlords/updatepassword/{id}
         [HttpPut("updatepassword/{id}")]
         public async Task<IActionResult> UpdateLandlordPassword(Guid id,  UpdateLandlordPasswordDto updateLandlordPasswordDto)
         {
@@ -132,6 +135,7 @@ namespace HouseRentingAPI.Controllers
             return Ok(new { Message = "密碼已更新" });
         }
 
+        // POST: api/Landlords/register
         [HttpPost("register")]
         public IActionResult UserRegister([FromBody]  LandlordRegisterDto landlordRegisterDto)
         {
@@ -154,7 +158,7 @@ namespace HouseRentingAPI.Controllers
                 return BadRequest(ModelState);
             }
         }
-        // POST: api/Landlords
+        // POST: api/Landlords/login
         [HttpPost("login")]
         public IActionResult UserLogin([FromBody]  LandlordLoginDto landlordLoginDto)
         {
@@ -176,7 +180,7 @@ namespace HouseRentingAPI.Controllers
             }
         }
 
-        // DELETE: api/Landlords/5
+        // DELETE: api/Landlords/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteLandlord(Guid id)
         {

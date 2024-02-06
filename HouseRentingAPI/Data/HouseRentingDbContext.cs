@@ -84,7 +84,6 @@ namespace HouseRentingAPI.Data
             // HouseFacility has composite primary key
             modelBuilder.Entity<HouseFacility>()
                 .HasKey(hf => new { hf.HouseID, hf.FacilityID });
-
         }
     }
 }

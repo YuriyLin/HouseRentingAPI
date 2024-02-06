@@ -40,7 +40,7 @@ namespace HouseRentingAPI.Controllers
             return Ok(record);
         }
 
-        // GET: api/Houses/5
+        // GET: api/Houses/{id}
         [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<GetHouseByIdDto>> GetHouseById(Guid id)
@@ -55,6 +55,8 @@ namespace HouseRentingAPI.Controllers
             return Ok(house);
         }
 
+        // House Searching
+        // Get:api/Houses/Search/{keyword}  
         [AllowAnonymous]
         [HttpGet("Search")]
         public async Task<ActionResult<IEnumerable<GetHouseDto>>> SearchHouses([FromQuery][Required] string keyword)
@@ -81,7 +83,7 @@ namespace HouseRentingAPI.Controllers
             return CreatedAtAction("GetHouseById", new { id = house.HouseID }, _mapper.Map<GetHouseByIdDto>(house));
         }
 
-        // PUT: api/Houses/5
+        // PUT: api/Houses/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateHouse(Guid id, UpdateHouseDto updateHouseDto)
         {
@@ -118,7 +120,7 @@ namespace HouseRentingAPI.Controllers
             return Ok(new { Message = "資料已更新" });
         }
 
-        // DELETE: api/Houses/5
+        // DELETE: api/Houses/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteHouse(Guid id)
         {

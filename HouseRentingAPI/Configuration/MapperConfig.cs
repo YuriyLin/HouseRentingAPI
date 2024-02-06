@@ -27,7 +27,8 @@ namespace HouseRentingAPI.Configuration
             CreateMap<House, UpdateHouseDto>().ReverseMap();
             CreateMap<House, GetHouseDto>().ReverseMap();
             CreateMap<House, GetHouseByIdDto>().ReverseMap();
-            
+
+            CreateMap<Favorite, FavoriteDto>().ReverseMap();
         }
     }
 }

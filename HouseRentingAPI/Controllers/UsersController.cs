@@ -29,6 +29,7 @@ namespace HouseRentingAPI.Controllers
         }
 
         // get all user information
+        // GET:api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetUserDto>>> GetUser()
         {
@@ -38,6 +39,7 @@ namespace HouseRentingAPI.Controllers
         }
 
         // get user all information by Id
+        // GET:api/Users/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<GetUserByIdDto>>> GetUserById(Guid id)
         {
@@ -51,7 +53,8 @@ namespace HouseRentingAPI.Controllers
             return Ok(user);
         }
 
-        //Update User Data
+        // Update User Data
+        // PUT:api/Users/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(Guid id, UpdateUserDto updateUserDto)
         {
@@ -88,7 +91,8 @@ namespace HouseRentingAPI.Controllers
             return Ok(new { Message = "資料已更新" });
         }
 
-        //user password update
+        // user password update
+        // PUT:api/Users/{id}
         [HttpPut("updatepassword/{id}")]
         public async Task<IActionResult> UpdateUserPassword(Guid id, UpdateUserPasswordDto updateuserPasswordDto)
         {
@@ -133,7 +137,8 @@ namespace HouseRentingAPI.Controllers
             return Ok(new { Message = "密碼已更新" });
         }
 
-        //User Register
+        // User Register
+        // POST:api/Users/register
         [HttpPost("register")]
         public IActionResult UserRegister([FromBody] UserRegisterDto userRegisterDto)
         {
@@ -157,7 +162,8 @@ namespace HouseRentingAPI.Controllers
             }
         }
 
-        //User Login
+        // User Login
+        // POST : api/Users/login
         [HttpPost("login")]
         public IActionResult UserLogin([FromBody] UserLoginDto userLoginDto)
         {
@@ -179,7 +185,8 @@ namespace HouseRentingAPI.Controllers
             }
         }
 
-        //Delete User
+        // Delete User
+        // DELETE : api/Users/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {

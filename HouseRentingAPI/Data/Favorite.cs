@@ -5,8 +5,6 @@ namespace HouseRentingAPI.Data
 {
     public class Favorite
     {
-        [Key]
-        public Guid FavoriteID { get; set; }
         public Guid UserID { get; set; }
         public Guid HouseID { get; set; }
 
