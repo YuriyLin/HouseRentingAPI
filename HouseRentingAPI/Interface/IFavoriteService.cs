@@ -4,7 +4,7 @@ using HouseRentingAPI.Model;
 
 namespace HouseRentingAPI.Interface
 {
-    public interface IFavoriteService: IGenericRepository<Favorite>
+    public interface IFavoriteService:IGenericRepository<Favorite>
     {
         Task<List<FavoriteDto>> GetUserFavoritesAsync(Guid userId);
         Task AddFavoriteAsync(Guid userId, Guid houseId);

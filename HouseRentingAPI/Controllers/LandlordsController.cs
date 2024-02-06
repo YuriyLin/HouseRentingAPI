@@ -22,7 +22,7 @@ namespace HouseRentingAPI.Controllers
 
         public LandlordsController(HouseRentingDbContext context,IMapper mapper,ILandlordService landlordService)
         {
-            _context = context;
+            this._context = context;
             this._mapper = mapper;
             this._landlordService = landlordService;
         }

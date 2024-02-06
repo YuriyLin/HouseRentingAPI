@@ -49,6 +49,7 @@ builder.Services.AddScoped<HousesController>();
 builder.Services.AddScoped<IHouseService, HouseService>();
 builder.Services.AddScoped<FavoritesController>();
 builder.Services.AddScoped<IFavoriteService, FavoriteService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 var app = builder.Build();
 

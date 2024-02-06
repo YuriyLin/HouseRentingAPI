@@ -22,12 +22,14 @@ namespace HouseRentingAPI.Controllers
         private readonly HouseRentingDbContext _context;
         private readonly IMapper _mapper;
         private readonly IHouseService _houseService;
+        private readonly ICommentService _commentService;
 
-        public HousesController(HouseRentingDbContext context, IMapper mapper, IHouseService houseService)
+        public HousesController(HouseRentingDbContext context, IMapper mapper, IHouseService houseService, ICommentService commentService)
         {
-            _context = context;
-            _mapper = mapper;
-            _houseService = houseService;
+            this._context = context;
+            this._mapper = mapper;
+            this._houseService = houseService;
+            this._commentService = commentService;
         }
 
         // GET: api/Houses
@@ -72,13 +74,13 @@ namespace HouseRentingAPI.Controllers
             }
         }
 
+        //待修正
         // POST: api/Houses
         [HttpPost]
         public async Task<ActionResult<HouseAddDto>> CreateHouse(HouseAddDto houseAddDto)
         {
             var house = _mapper.Map<House>(houseAddDto);
-            _context.Houses.Add(house);
-            await _context.SaveChangesAsync();
+            await _houseService.AddAsync(house);
 
             return CreatedAtAction("GetHouseById", new { id = house.HouseID }, _mapper.Map<GetHouseByIdDto>(house));
         }
@@ -139,5 +141,57 @@ namespace HouseRentingAPI.Controllers
         {
             return await _houseService.Exists(id);
         }
+
+
+        //-----------Comment-------------------(Add/Update/Delete)
+        // POST: api/Houses/{houseId}/comments
+        [HttpPost("{houseId}/comments")]
+        public async Task<IActionResult> AddComment(Guid houseId, [FromBody] string content, [FromRoute] Guid userId)
+        {
+            try
+            {
+                await _houseService.AddCommentAsync(houseId, content, userId);
+                return Ok(new { Message = "Comment added successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Error = "Failed to add comment.", Details = ex.Message });
+            }
+        }
+
+        // PUT: api/Houses/{houseId}/comments/{commentId}
+        [HttpPut("{houseId}/comments/{commentId}")]
+        public async Task<IActionResult> UpdateComment(Guid houseId, Guid commentId, [FromBody] Comment comment)
+        {
+            try
+            {
+                if (commentId != comment.CommentId || houseId != comment.HouseId)
+                    return BadRequest("Invalid comment ID or house ID.");
+
+                await _houseService.UpdateCommentAsync(comment);
+                return Ok(new { Message = "Comment updated successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Error = "Failed to update comment.", Details = ex.Message });
+            }
+        }
+
+        // DELETE: api/Houses/{houseId}/comments/{commentId}
+        [HttpDelete("{houseId}/comments/{commentId}")]
+        public async Task<IActionResult> DeleteComment(Guid houseId, Guid commentId)
+        {
+            try
+            {
+                await _houseService.DeleteCommentAsync(commentId);
+                return Ok(new { Message = "Comment deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Error = "Failed to delete comment.", Details = ex.Message });
+            }
+        }
+
+        //---------------------------------------------------------
     }
 }

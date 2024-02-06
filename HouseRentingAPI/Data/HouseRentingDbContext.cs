@@ -20,6 +20,7 @@ namespace HouseRentingAPI.Data
         public DbSet<OtherAttribute> OtherAttributes { get; set; }
         public DbSet<Favorite> Favorites { get; set; }
         public DbSet<ComparisonList> ComparisonLists { get; set; }
+        public DbSet<Comment> Comment { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,6 +35,18 @@ namespace HouseRentingAPI.Data
                 .HasOne(f => f.House)
                 .WithMany(h => h.Favorites)
                 .HasForeignKey(f => f.HouseID);
+
+            // User to Comment (One-to-Many) 
+            modelBuilder.Entity<Comment>()
+            .HasOne(c => c.User)
+            .WithMany(u => u.Comments)
+            .HasForeignKey(c => c.UserId);
+
+            // House to Comment (One-to-Many)
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.House)
+                .WithMany(h => h.Comments)
+                .HasForeignKey(c => c.HouseId);
 
             // HouseFacility to House (many-to-one)
             modelBuilder.Entity<HouseFacility>()

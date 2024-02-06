@@ -26,6 +26,7 @@ namespace HouseRentingAPI.Data
         public ICollection<HouseFacility> HouseFacilities { get; set; }
         public ICollection<HouseOtherAttribute> HouseOtherAttributes { get; set; }
         public ICollection<Favorite> Favorites { get; set; }
+        public ICollection<Comment> Comments { get; set; }
         public ICollection<ComparisonList> ComparisonLists { get; set; }
     }
 

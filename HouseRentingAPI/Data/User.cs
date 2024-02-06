@@ -16,6 +16,7 @@ namespace HouseRentingAPI.Data
         public string PhoneNum { get; set; }
         public string? Email { get; set; }
         public ICollection<Favorite> Favorites { get; set; }
+        public ICollection<Comment> Comments { get; set; }
         public ICollection<ComparisonList> ComparisonLists { get; set; }
     }
 }
