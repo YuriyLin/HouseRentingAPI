@@ -5,6 +5,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HouseRentingAPI.Service
 {
+    // 獲取所有房屋資訊
+    // 以ID獲取房屋資訊
+    // 刊登房屋
+    // 更新房屋
+    // 刪除房屋
+    // 房屋查詢
+    // 評論新增
+    // 修改評論
+    // 刪除評論
+
     public class HouseService : GenericService<House>, IHouseService
     {
         private readonly HouseRentingDbContext _context;

@@ -140,39 +140,30 @@ namespace HouseRentingAPI.Controllers
         // User Register
         // POST:api/Users/register
         [HttpPost("register")]
-        public IActionResult UserRegister([FromBody] UserRegisterDto userRegisterDto)
+        public async Task<IActionResult> UserRegister([FromBody] UserRegisterDto userRegisterDto)
         {
-            if (ModelState.IsValid)
+            try
             {
-                // 檢查是否已經存在相同的學號（StuId）
-                if (_context.User.Any(u => u.StuId == userRegisterDto.StuId))
-                {
-                    return BadRequest(new { Message = "學號已被使用" });
-                }
-
-                var user = _mapper.Map<User>(userRegisterDto);
-                _context.User.Add(user);
-                _context.SaveChanges();
-
+                await _userService.RegisterAsync(userRegisterDto);
                 return Ok(new { Message = "註冊成功" });
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new { Error = "註冊失敗", Details = ex.Message });
             }
         }
 
         // User Login
         // POST : api/Users/login
         [HttpPost("login")]
-        public IActionResult UserLogin([FromBody] UserLoginDto userLoginDto)
+        public async Task<IActionResult> UserLogin([FromBody] UserLoginDto userLoginDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var user = _context.User.FirstOrDefault(u => u.StuId == userLoginDto.StuId && u.Password == userLoginDto.Password);
+            var user = await _userService.loginAsync(userLoginDto);
 
             if (user != null)
             {

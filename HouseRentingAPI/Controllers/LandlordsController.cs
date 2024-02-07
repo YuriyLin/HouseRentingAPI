@@ -137,37 +137,29 @@ namespace HouseRentingAPI.Controllers
 
         // POST: api/Landlords/register
         [HttpPost("register")]
-        public IActionResult UserRegister([FromBody]  LandlordRegisterDto landlordRegisterDto)
+        public async Task<IActionResult> LandlordRegister([FromBody] LandlordRegisterDto landlordRegisterDto)
         {
-            if (ModelState.IsValid)
+            try
             {
-                // 檢查是否已經存在相同的手機號碼
-                if (_context.Landlords.Any(u => u.Phone == landlordRegisterDto.Phone))
-                {
-                    return BadRequest(new { Message = "該號碼已被使用" });
-                }
-
-                var landlord = _mapper.Map<Landlord>(landlordRegisterDto);
-                _context.Landlords.Add(landlord);
-                _context.SaveChanges();
-
+                await _landlordService.RegisterAsync(landlordRegisterDto);
                 return Ok(new { Message = "註冊成功" });
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new { Error = "註冊失敗", Details = ex.Message });
             }
         }
+
         // POST: api/Landlords/login
         [HttpPost("login")]
-        public IActionResult UserLogin([FromBody]  LandlordLoginDto landlordLoginDto)
+        public async Task<IActionResult> LandlordLogin([FromBody]  LandlordLoginDto landlordLoginDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var landlord = _context.Landlords.FirstOrDefault(u => u.Phone == landlordLoginDto.Phone && u.Password == landlordLoginDto.Password);
+            var landlord = await _landlordService.loginAsync(landlordLoginDto);
 
             if (landlord != null)
             {

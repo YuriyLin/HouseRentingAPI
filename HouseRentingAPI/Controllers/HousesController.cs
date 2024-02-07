@@ -74,7 +74,6 @@ namespace HouseRentingAPI.Controllers
             }
         }
 
-        //待修正
         // POST: api/Houses
         [HttpPost]
         public async Task<ActionResult<HouseAddDto>> CreateHouse(HouseAddDto houseAddDto)

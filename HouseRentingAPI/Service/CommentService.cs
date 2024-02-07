@@ -6,6 +6,8 @@ namespace HouseRentingAPI.Service
 {
     public class CommentService : GenericService<Comment>, ICommentService
     {
+        //以ID列出所有評論
+
         private readonly HouseRentingDbContext _context;
 
         public CommentService(HouseRentingDbContext context) : base(context)

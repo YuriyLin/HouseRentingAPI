@@ -7,6 +7,10 @@ namespace HouseRentingAPI.Service
 {
     public class FavoriteService : GenericService<Favorite>, IFavoriteService
     {
+        // 列出用戶收藏列表
+        // 加入收藏
+        // 移除收藏
+
         private readonly HouseRentingDbContext _context;
 
         public FavoriteService(HouseRentingDbContext context) : base(context)
