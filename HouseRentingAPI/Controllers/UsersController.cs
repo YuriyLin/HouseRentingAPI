@@ -167,7 +167,7 @@ namespace HouseRentingAPI.Controllers
 
             if (user != null)
             {
-                return Ok(new { Message = "登入成功" });
+                return Ok(new { Message = "登入成功", UserId = user.Id});
             }
 
             else
