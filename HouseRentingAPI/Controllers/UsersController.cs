@@ -140,7 +140,7 @@ namespace HouseRentingAPI.Controllers
         // User Register
         // POST:api/Users/register
         [HttpPost("register")]
-        public async Task<IActionResult> UserRegister([FromBody] UserRegisterDto userRegisterDto)
+        public async Task<IActionResult> UserRegister([FromForm] UserRegisterDto userRegisterDto)
         {
             try
             {

@@ -40,30 +40,34 @@ namespace HouseRentingAPI.Service
 
             if (userRegisterDto.StudentIdCard != null && userRegisterDto.StudentIdCard.Length > 0)
             {
-                // 指定上傳文件的保存路徑
+                // 指定上传文件的保存路径
                 var uploadDirectory = @"C:\Users\USER\Downloads\HouseRentingAPI\HouseRentingAPI\UploadStuIDCard";
+
+                // 创建上传目录
                 if (!Directory.Exists(uploadDirectory))
                 {
-                    Directory.CreateDirectory(uploadDirectory); // 如果目錄不存在，則創建目錄
+                    Directory.CreateDirectory(uploadDirectory);
                 }
 
-                // 生成文件名並拼接文件路徑
+                // 生成文件名并拼接文件路径
                 var fileName = $"{Guid.NewGuid().ToString()}{Path.GetExtension(userRegisterDto.StudentIdCard.FileName)}";
                 var filePath = Path.Combine(uploadDirectory, fileName);
 
-                // 將文件保存到指定路徑
+
+                // 将文件保存到指定路径
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await userRegisterDto.StudentIdCard.CopyToAsync(stream);
                 }
 
-                // 將文件路徑儲存到用户註冊訊息中，或者根據需要進行其他處理
+                // 将文件路径保存到用户注册信息中
                 userRegisterDto.StudentIdCardPath = filePath;
-            }
 
-            var user = _mapper.Map<User>(userRegisterDto);
-            _context.User.Add(user);
-            await _context.SaveChangesAsync();
+                // 将用户信息保存到数据库
+                var user = _mapper.Map<User>(userRegisterDto);
+                _context.User.Add(user);
+                await _context.SaveChangesAsync();  
+            }
         }
     }
 }

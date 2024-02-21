@@ -23,7 +23,6 @@ namespace HouseRentingAPI.Model
     public class UserLoginDto
     {
         public string StuId { get; set; }
-        public string Name { get; set; }
         public string Password { get; set; }
     }
 
