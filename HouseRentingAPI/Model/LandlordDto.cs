@@ -1,18 +1,25 @@
 ﻿using HouseRentingAPI.Data;
+using System.ComponentModel.DataAnnotations;
 
 namespace HouseRentingAPI.Model
 {
     public class LandlordLoginDto
     {
+        [Required]
         public string Phone { get; set; }
+        [Required]
         public string Password { get; set; }
     }
 
     public class LandlordRegisterDto
     {
+        [Required]
         public string Landlordname {  get; set; }
+        [Required]
         public string Phone { get; set; }
+        [Required]
         public string? LineId {  get; set; }
+        [Required]
         public string Password { get; set; }
     }
 

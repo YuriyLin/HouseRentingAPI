@@ -137,7 +137,7 @@ namespace HouseRentingAPI.Controllers
 
         // POST: api/Landlords/register
         [HttpPost("register")]
-        public async Task<IActionResult> LandlordRegister([FromBody] LandlordRegisterDto landlordRegisterDto)
+        public async Task<IActionResult> LandlordRegister([FromForm] LandlordRegisterDto landlordRegisterDto)
         {
             try
             {
@@ -163,7 +163,7 @@ namespace HouseRentingAPI.Controllers
 
             if (landlord != null)
             {
-                return Ok(new { Message = "登入成功" });
+                return Ok(new { Message = "登入成功", LandlordId = landlord.LandlordID });
             }
 
             else

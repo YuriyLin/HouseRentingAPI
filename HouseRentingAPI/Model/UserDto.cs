@@ -7,11 +7,11 @@ namespace HouseRentingAPI.Model
     public class UserRegisterDto 
     {
         [Required]
-        public string StuId { get; set; }
-        [Required]
         public string Name { get; set; }
         [Required]
         public string PhoneNum { get; set; }
+        [Required]
+        public string StuId { get; set; }
         public string? Email { get; set; }
         [Required]
         public string Password { get; set; }
@@ -28,7 +28,6 @@ namespace HouseRentingAPI.Model
 
     public class GetUserDto
     {
-        public Guid Id { get; set; }
         public string StuId { get; set; }
         public string Name { get; set; }
     }
@@ -44,7 +43,6 @@ namespace HouseRentingAPI.Model
 
     public class UpdateUserDto
     {
-        public Guid Id { get; set; }
         public string? StuId { get; set; }
         public string? Name { get; set; }
         public string? PhoneNum { get; set; }
@@ -53,7 +51,6 @@ namespace HouseRentingAPI.Model
 
     public class UpdateUserPasswordDto
     {
-        public Guid Id { get; set; }
         [Required]
         public string OldPassword { get; set; }
         [Required]
