@@ -1,6 +1,7 @@
 ﻿using HotelListing.API.Constract;
 using HouseRentingAPI.Data;
 using HouseRentingAPI.Interface;
+using HouseRentingAPI.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace HouseRentingAPI.Service
@@ -24,6 +25,20 @@ namespace HouseRentingAPI.Service
         {
             this._context = context;
             this._commentService = commentService;
+        }
+
+        public async Task<List<GetHouseDto>> GetAllHouses()
+        {
+            return await _context.Houses
+                .Select(h => new GetHouseDto
+                {
+                    Housename = h.HouseName,
+                    Address = h.Address,
+                    PropertyTypeName = h.PropertyType.TypeName,
+                    SquareFeet = h.SquareFeet,
+                    Price = h.Price
+                })
+                .ToListAsync();
         }
 
         public async Task<List<House>> SearchHouses(string keyword)

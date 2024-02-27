@@ -34,18 +34,17 @@ namespace HouseRentingAPI.Model
 
     public class GetUserByIdDto
     {
-        public string StuId { get; set; }
         public string Name { get; set; }
         public string PhoneNum { get; set; }
+        public string StuId { get; set; }
         public string Email { get; set; }
-        public ICollection<Favorite> Favorites { get; set; }
     }
 
     public class UpdateUserDto
     {
-        public string? StuId { get; set; }
         public string? Name { get; set; }
         public string? PhoneNum { get; set; }
+        public string? StuId { get; set; }
         public string? Email { get; set; }
     }
 

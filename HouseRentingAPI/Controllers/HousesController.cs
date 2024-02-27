@@ -37,7 +37,7 @@ namespace HouseRentingAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetHouseDto>>> GetHouses()
         {
-            var houses = await _houseService.GetAllAsync();
+            var houses = await _houseService.GetAllHouses();
             var record = _mapper.Map<List<GetHouseDto>>(houses);
             return Ok(record);
         }
@@ -75,6 +75,7 @@ namespace HouseRentingAPI.Controllers
         }
 
         // POST: api/Houses
+        [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult<HouseAddDto>> CreateHouse(HouseAddDto houseAddDto)
         {

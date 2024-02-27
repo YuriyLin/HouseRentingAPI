@@ -53,10 +53,10 @@ namespace HouseRentingAPI.Model
 
     public class GetHouseDto
     {
-        public Guid HouseID { get; set; }
         public string Housename { get;set; }
         public string Address { get; set; }
-        public string Landlordname { get; set; }
+        public string PropertyTypeName { get; set; }
+        public string SquareFeet { get; set; }
         public int Price { get; set; }
     }
 

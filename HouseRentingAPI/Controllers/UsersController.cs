@@ -49,8 +49,9 @@ namespace HouseRentingAPI.Controllers
             {
                 return NotFound();
             }
+            var record = _mapper.Map<GetUserByIdDto>(user);
 
-            return Ok(user);
+            return Ok(record);
         }
 
         // Update User Data
