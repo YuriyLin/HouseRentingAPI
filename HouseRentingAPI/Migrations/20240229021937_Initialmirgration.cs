@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HouseRentingAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class Initialmirgration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,7 +15,8 @@ namespace HouseRentingAPI.Migrations
                 name: "Facilities",
                 columns: table => new
                 {
-                    FacilityID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FacilityID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     FacilityName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -42,7 +43,8 @@ namespace HouseRentingAPI.Migrations
                 name: "OtherAttributes",
                 columns: table => new
                 {
-                    AttributeID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AttributeID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     AttributeName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -54,12 +56,13 @@ namespace HouseRentingAPI.Migrations
                 name: "PropertyTypes",
                 columns: table => new
                 {
-                    TypeID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PropertyTypeID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     TypeName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PropertyTypes", x => x.TypeID);
+                    table.PrimaryKey("PK_PropertyTypes", x => x.PropertyTypeID);
                 });
 
             migrationBuilder.CreateTable(
@@ -71,7 +74,8 @@ namespace HouseRentingAPI.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNum = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StudentIdCardPath = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -84,11 +88,13 @@ namespace HouseRentingAPI.Migrations
                 {
                     HouseID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LandlordID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PropertyTypeID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PropertyTypeID = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<int>(type: "int", nullable: false),
                     Distance = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     HouseName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SquareFeet = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -103,7 +109,34 @@ namespace HouseRentingAPI.Migrations
                         name: "FK_Houses_PropertyTypes_PropertyTypeID",
                         column: x => x.PropertyTypeID,
                         principalTable: "PropertyTypes",
-                        principalColumn: "TypeID",
+                        principalColumn: "PropertyTypeID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Comment",
+                columns: table => new
+                {
+                    CommentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    HouseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CommentText = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Comment", x => x.CommentId);
+                    table.ForeignKey(
+                        name: "FK_Comment_Houses_HouseId",
+                        column: x => x.HouseId,
+                        principalTable: "Houses",
+                        principalColumn: "HouseID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Comment_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -136,13 +169,12 @@ namespace HouseRentingAPI.Migrations
                 name: "Favorites",
                 columns: table => new
                 {
-                    FavoriteID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     HouseID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Favorites", x => x.FavoriteID);
+                    table.PrimaryKey("PK_Favorites", x => new { x.HouseID, x.UserID });
                     table.ForeignKey(
                         name: "FK_Favorites_Houses_HouseID",
                         column: x => x.HouseID,
@@ -162,7 +194,7 @@ namespace HouseRentingAPI.Migrations
                 columns: table => new
                 {
                     HouseID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FacilityID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    FacilityID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -186,7 +218,7 @@ namespace HouseRentingAPI.Migrations
                 columns: table => new
                 {
                     HouseID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AttributeID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    AttributeID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -206,6 +238,16 @@ namespace HouseRentingAPI.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Comment_HouseId",
+                table: "Comment",
+                column: "HouseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comment_UserId",
+                table: "Comment",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ComparisonLists_HouseID",
                 table: "ComparisonLists",
                 column: "HouseID");
@@ -214,11 +256,6 @@ namespace HouseRentingAPI.Migrations
                 name: "IX_ComparisonLists_UserID",
                 table: "ComparisonLists",
                 column: "UserID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Favorites_HouseID",
-                table: "Favorites",
-                column: "HouseID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Favorites_UserID",
@@ -249,6 +286,9 @@ namespace HouseRentingAPI.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Comment");
+
             migrationBuilder.DropTable(
                 name: "ComparisonLists");
 

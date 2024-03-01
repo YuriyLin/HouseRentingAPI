@@ -11,25 +11,30 @@ using AutoMapper;
 using HouseRentingAPI.Interface;
 using HouseRentingAPI.Model;
 using System.ComponentModel.DataAnnotations;
+using HouseRentingAPI.Service;
 
 namespace HouseRentingAPI.Controllers
 {
     [Route("api/[controller]")]
     [Authorize(Roles = "Landlord")]
     [ApiController]
-    public class HousesController : ControllerBase
+    public partial class HousesController : ControllerBase
     {
         private readonly HouseRentingDbContext _context;
         private readonly IMapper _mapper;
         private readonly IHouseService _houseService;
         private readonly ICommentService _commentService;
+        private readonly IHouseAttributeService _houseAttributeService;
+        private readonly IHouseFacilityService _houseFacilityService;
 
-        public HousesController(HouseRentingDbContext context, IMapper mapper, IHouseService houseService, ICommentService commentService)
+        public HousesController(HouseRentingDbContext context, IMapper mapper, IHouseService houseService, ICommentService commentService,IHouseAttributeService houseAttributeService,IHouseFacilityService houseFacilityService)
         {
             this._context = context;
             this._mapper = mapper;
             this._houseService = houseService;
             this._commentService = commentService;
+            this._houseAttributeService = houseAttributeService;
+            this._houseFacilityService = houseFacilityService;
         }
 
         // GET: api/Houses
@@ -81,9 +86,35 @@ namespace HouseRentingAPI.Controllers
         {
             var house = _mapper.Map<House>(houseAddDto);
             await _houseService.AddAsync(house);
+            var houseID = house.HouseID;
+
+            // 將 houseID 設置到 houseFacility 和 houseAttribute 的 HouseID 屬性
+            foreach (var facilityId in houseAddDto.FacilityIDs)
+            {
+                var facility = await _houseFacilityService.GetByIdAsync(houseID, facilityId);
+                if (facility == null)
+                {
+                    house.HouseFacilities.Add(new HouseFacility { HouseID = houseID, FacilityID = facilityId });
+                }
+            }
+
+            foreach (var attributeId in houseAddDto.AttributeIDs)
+            {
+                var attribute = await _houseAttributeService.GetByIdAsync(houseID, attributeId);
+                if (attribute == null)
+                {
+                    house.HouseOtherAttributes.Add(new HouseOtherAttribute { HouseID = houseID, AttributeID = attributeId });
+                }
+            }
+
+            // 更新 house
+            await _houseService.UpdateAsync(house);
 
             return CreatedAtAction("GetHouseById", new { id = house.HouseID }, _mapper.Map<GetHouseByIdDto>(house));
         }
+
+
+
 
         // PUT: api/Houses/{id}
         [HttpPut("{id}")]
@@ -123,6 +154,7 @@ namespace HouseRentingAPI.Controllers
         }
 
         // DELETE: api/Houses/{id}
+        [AllowAnonymous]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteHouse(Guid id)
         {
@@ -142,14 +174,17 @@ namespace HouseRentingAPI.Controllers
             return await _houseService.Exists(id);
         }
 
-
         //-----------Comment-------------------(Add/Update/Delete)
         // POST: api/Houses/{houseId}/comments
-        [HttpPost("{houseId}/comments")]
-        public async Task<IActionResult> AddComment(Guid houseId, [FromBody] string content, [FromRoute] Guid userId)
+        [AllowAnonymous]
+        [HttpPost("comments")]
+        public async Task<IActionResult> AddComment([FromBody] CommentAddDto commentAddDto)
         {
             try
             {
+                Guid houseId = commentAddDto.HouseId;
+                string content = commentAddDto.CommentText;
+                Guid userId = commentAddDto.UserId;
                 await _houseService.AddCommentAsync(houseId, content, userId);
                 return Ok(new { Message = "Comment added successfully." });
             }

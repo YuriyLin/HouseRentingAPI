@@ -8,12 +8,12 @@ namespace HouseRentingAPI.Model
     {
         public Guid HouseID { get; set; }
         public Guid LandlordID { get; set; }
-        public Guid PropertyTypeID { get; set; }
+        public int PropertyTypeID { get; set; }
         public int Price { get; set; }
         public int Distance { get; set; }
         public string HouseName { get; set; }
         public string Address { get; set; }
-
+        public string SquareFeet { get; set; }
         public Landlord Landlord { get; set; }
 
         public PropertyType PropertyType { get; set; }
@@ -26,12 +26,20 @@ namespace HouseRentingAPI.Model
 
     public class HouseAddDto
     {
+        public Guid? HouseID { get; set; }
+        [Required]
         public string Housename {  get; set; }
+        [Required]
         public string Address { get; set;}
+        [Required]
         public string? Description { get; set; }
+        [Required]
         public int Price { get; set; }
         public int? Distance { get; set; }
-        public string Landlordname { get; set; }
+        [Required]
+        public string SquareFeet { get; set; }
+        public Guid LandlordID { get; set; }
+        [Required]
         public int PropertyTypeID { get; set; }
         public List<int> FacilityIDs { get; set; }
         public List<int> AttributeIDs { get; set; }
@@ -40,13 +48,14 @@ namespace HouseRentingAPI.Model
     public class UpdateHouseDto
     {
         public Guid HouseID { get; set; }
-        public string Housename { get; set; }
-        public string Address { get; set; }
+        public string? Housename { get; set; }
+        public string? Address { get; set; }
         public string? Description { get; set; }
-        public int Price { get; set; }
+        public int? Price { get; set; }
         public int? Distance { get; set; }
-        public string Landlordname { get; set; }
-        public int PropertyTypeID { get; set; }
+        public string? SquareFeet { get; set; }
+        public Guid LandlordID { get; set; }
+        public int? PropertyTypeID { get; set; }
         public List<int> FacilityIDs { get; set; }
         public List<int> AttributeIDs { get; set; }
     }

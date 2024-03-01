@@ -6,6 +6,7 @@ using HouseRentingAPI.Data;
 using HouseRentingAPI.Interface;
 using HouseRentingAPI.Service;
 using Microsoft.EntityFrameworkCore;
+using static HouseRentingAPI.Controllers.HousesController;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +51,8 @@ builder.Services.AddScoped<IHouseService, HouseService>();
 builder.Services.AddScoped<FavoritesController>();
 builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<IHouseFacilityService, HouseFacilityService>();
+builder.Services.AddScoped<IHouseAttributeService, HouseAttributeService>();
 
 var app = builder.Build();
 

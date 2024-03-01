@@ -1,4 +1,5 @@
-﻿using HotelListing.API.Constract;
+﻿using AutoMapper;
+using HotelListing.API.Constract;
 using HouseRentingAPI.Data;
 using HouseRentingAPI.Interface;
 using HouseRentingAPI.Model;
@@ -20,11 +21,13 @@ namespace HouseRentingAPI.Service
     {
         private readonly HouseRentingDbContext _context;
         private readonly ICommentService _commentService;
+        private readonly IMapper _mapper;
 
-        public HouseService(HouseRentingDbContext context, ICommentService commentService) : base(context)
+        public HouseService(HouseRentingDbContext context, ICommentService commentService,IMapper mapper) : base(context)
         {
             this._context = context;
             this._commentService = commentService;
+            this._mapper = mapper;
         }
 
         public async Task<List<GetHouseDto>> GetAllHouses()
@@ -54,18 +57,31 @@ namespace HouseRentingAPI.Service
                 .ToListAsync();
         }
 
-        public async Task AddCommentAsync(Guid houseId, string content, Guid userId)
+        public async Task<CommentAddDto> AddCommentAsync(Guid houseId, string content, Guid userId)
         {
+            // 创建评论对象
             var comment = new Comment
             {
                 HouseId = houseId,
                 CommentText = content,
                 UserId = userId,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow // 在服务端自动生成 UTC 时间戳
             };
 
+            // 将评论对象添加到评论服务中
             await _commentService.AddAsync(comment);
+
+            // 使用 AutoMapper 将评论对象映射为 CommentAddDto 对象
+            var commentDto = _mapper.Map<CommentAddDto>(comment);
+
+            // 将 UTC 时间转换为台湾标准时间并进行格式化
+            var taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
+            var taiwanTime = TimeZoneInfo.ConvertTimeFromUtc(comment.CreatedAt, taiwanTimeZone);
+            commentDto.CreatedAt = taiwanTime.ToString("yyyy-MM-dd HH:mm");
+
+            return commentDto;
         }
+
         public async Task<List<Comment>> GetCommentsByHouseIdAsync(Guid houseId)
         {
             return await _commentService.GetCommentsByHouseIdAsync(houseId);
@@ -81,4 +97,5 @@ namespace HouseRentingAPI.Service
             await _commentService.DeleteAsync(commentId);
         }
     }
+
 }

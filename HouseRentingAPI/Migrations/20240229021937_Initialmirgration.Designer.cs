@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HouseRentingAPI.Migrations
 {
     [DbContext(typeof(HouseRentingDbContext))]
-    [Migration("20240206070307_AddNewColumn")]
-    partial class AddNewColumn
+    [Migration("20240229021937_Initialmirgration")]
+    partial class Initialmirgration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,34 @@ namespace HouseRentingAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("HouseRentingAPI.Data.Comment", b =>
+                {
+                    b.Property<Guid>("CommentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CommentText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("HouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("CommentId");
+
+                    b.HasIndex("HouseId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comment");
+                });
 
             modelBuilder.Entity("HouseRentingAPI.Data.ComparisonList", b =>
                 {
@@ -48,9 +76,11 @@ namespace HouseRentingAPI.Migrations
 
             modelBuilder.Entity("HouseRentingAPI.Data.Facility", b =>
                 {
-                    b.Property<Guid>("FacilityID")
+                    b.Property<int>("FacilityID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FacilityID"));
 
                     b.Property<string>("FacilityName")
                         .IsRequired()
@@ -63,19 +93,13 @@ namespace HouseRentingAPI.Migrations
 
             modelBuilder.Entity("HouseRentingAPI.Data.Favorite", b =>
                 {
-                    b.Property<Guid>("FavoriteID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("HouseID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("UserID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("FavoriteID");
-
-                    b.HasIndex("HouseID");
+                    b.HasKey("HouseID", "UserID");
 
                     b.HasIndex("UserID");
 
@@ -109,8 +133,12 @@ namespace HouseRentingAPI.Migrations
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("PropertyTypeID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("PropertyTypeID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SquareFeet")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("HouseID");
 
@@ -126,8 +154,8 @@ namespace HouseRentingAPI.Migrations
                     b.Property<Guid>("HouseID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("FacilityID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("FacilityID")
+                        .HasColumnType("int");
 
                     b.HasKey("HouseID", "FacilityID");
 
@@ -141,8 +169,8 @@ namespace HouseRentingAPI.Migrations
                     b.Property<Guid>("HouseID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AttributeID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("AttributeID")
+                        .HasColumnType("int");
 
                     b.HasKey("HouseID", "AttributeID");
 
@@ -179,9 +207,11 @@ namespace HouseRentingAPI.Migrations
 
             modelBuilder.Entity("HouseRentingAPI.Data.OtherAttribute", b =>
                 {
-                    b.Property<Guid>("AttributeID")
+                    b.Property<int>("AttributeID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AttributeID"));
 
                     b.Property<string>("AttributeName")
                         .IsRequired()
@@ -194,15 +224,17 @@ namespace HouseRentingAPI.Migrations
 
             modelBuilder.Entity("HouseRentingAPI.Data.PropertyType", b =>
                 {
-                    b.Property<Guid>("TypeID")
+                    b.Property<int>("PropertyTypeID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PropertyTypeID"));
 
                     b.Property<string>("TypeName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("TypeID");
+                    b.HasKey("PropertyTypeID");
 
                     b.ToTable("PropertyTypes");
                 });
@@ -232,9 +264,32 @@ namespace HouseRentingAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("StudentIdCardPath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("HouseRentingAPI.Data.Comment", b =>
+                {
+                    b.HasOne("HouseRentingAPI.Data.House", "House")
+                        .WithMany("Comments")
+                        .HasForeignKey("HouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HouseRentingAPI.Data.User", "User")
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("House");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HouseRentingAPI.Data.ComparisonList", b =>
@@ -339,6 +394,8 @@ namespace HouseRentingAPI.Migrations
 
             modelBuilder.Entity("HouseRentingAPI.Data.House", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("ComparisonLists");
 
                     b.Navigation("Favorites");
@@ -365,6 +422,8 @@ namespace HouseRentingAPI.Migrations
 
             modelBuilder.Entity("HouseRentingAPI.Data.User", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("ComparisonLists");
 
                     b.Navigation("Favorites");

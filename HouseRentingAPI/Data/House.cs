@@ -25,8 +25,8 @@ namespace HouseRentingAPI.Data
         [ForeignKey("PropertyTypeID")]
         public PropertyType PropertyType { get; set; }
 
-        public ICollection<HouseFacility> HouseFacilities { get; set; }
-        public ICollection<HouseOtherAttribute> HouseOtherAttributes { get; set; }
+        public ICollection<HouseFacility> HouseFacilities { get; set; } = new List<HouseFacility>();
+        public ICollection<HouseOtherAttribute> HouseOtherAttributes { get; set; } = new List<HouseOtherAttribute>();
         public ICollection<Favorite> Favorites { get; set; }
         public ICollection<Comment> Comments { get; set; }
         public ICollection<ComparisonList> ComparisonLists { get; set; }
