@@ -26,8 +26,9 @@ namespace HouseRentingAPI.Controllers
         private readonly ICommentService _commentService;
         private readonly IHouseAttributeService _houseAttributeService;
         private readonly IHouseFacilityService _houseFacilityService;
+        private readonly ILandlordService _landlordService;
 
-        public HousesController(HouseRentingDbContext context, IMapper mapper, IHouseService houseService, ICommentService commentService,IHouseAttributeService houseAttributeService,IHouseFacilityService houseFacilityService)
+        public HousesController(HouseRentingDbContext context, IMapper mapper, IHouseService houseService, ICommentService commentService,IHouseAttributeService houseAttributeService,IHouseFacilityService houseFacilityService,ILandlordService landlordService)
         {
             this._context = context;
             this._mapper = mapper;
@@ -35,6 +36,7 @@ namespace HouseRentingAPI.Controllers
             this._commentService = commentService;
             this._houseAttributeService = houseAttributeService;
             this._houseFacilityService = houseFacilityService;
+            this._landlordService = landlordService;
         }
 
         // GET: api/Houses
@@ -52,14 +54,34 @@ namespace HouseRentingAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<GetHouseByIdDto>> GetHouseById(Guid id)
         {
-            var house = await _houseService.GetAsync(id);
+            var house = await _context.Houses
+                .Include(h => h.Landlord)
+                .Include(h => h.PropertyType)
+                .Include(h => h.HouseFacilities)
+                .Include(h => h.HouseOtherAttributes)
+                .Include(h => h.Comments)
+                .FirstOrDefaultAsync(h => h.HouseID == id);
 
             if (house == null)
             {
                 return NotFound();
             }
 
-            return Ok(house);
+            var gethouse = new GetHouseByIdDto
+            {
+                Housename = house.HouseName,
+                Address = house.Address,
+                Description = house.Description,
+                Price = house.Price,
+                Distance = house.Distance,
+                Landlordname = house.Landlord.Landlordname,
+                PropertyTypeName = house.PropertyType.TypeName,
+                FacilityIDs = house.HouseFacilities.Select(f => f.FacilityID).ToList(),
+                AttributeIDs = house.HouseOtherAttributes.Select(a => a.AttributeID).ToList(),
+                Comments = house.Comments.Select(c => c.CommentText).ToList()
+            };
+
+            return Ok(gethouse);
         }
 
         // House Searching
@@ -84,7 +106,16 @@ namespace HouseRentingAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<HouseAddDto>> CreateHouse(HouseAddDto houseAddDto)
         {
+            var landlord = await _landlordService.GetAsync(houseAddDto.LandlordID);
+
+            if (landlord == null)
+            {
+                return BadRequest("Landlord not found.");
+            }
+
             var house = _mapper.Map<House>(houseAddDto);
+
+            house.Landlord = landlord;
             await _houseService.AddAsync(house);
             var houseID = house.HouseID;
 
@@ -106,10 +137,9 @@ namespace HouseRentingAPI.Controllers
                     house.HouseOtherAttributes.Add(new HouseOtherAttribute { HouseID = houseID, AttributeID = attributeId });
                 }
             }
-
+           
             // 更新 house
             await _houseService.UpdateAsync(house);
-
             return CreatedAtAction("GetHouseById", new { id = house.HouseID }, _mapper.Map<GetHouseByIdDto>(house));
         }
 
@@ -117,6 +147,7 @@ namespace HouseRentingAPI.Controllers
 
 
         // PUT: api/Houses/{id}
+        [AllowAnonymous]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateHouse(Guid id, UpdateHouseDto updateHouseDto)
         {
@@ -178,13 +209,13 @@ namespace HouseRentingAPI.Controllers
         // POST: api/Houses/{houseId}/comments
         [AllowAnonymous]
         [HttpPost("comments")]
-        public async Task<IActionResult> AddComment([FromBody] CommentAddDto commentAddDto)
+        public async Task<IActionResult> AddComment([FromBody] CommentDto commentDto)
         {
             try
             {
-                Guid houseId = commentAddDto.HouseId;
-                string content = commentAddDto.CommentText;
-                Guid userId = commentAddDto.UserId;
+                Guid houseId = commentDto.HouseId;
+                string content = commentDto.CommentText;
+                Guid userId = commentDto.UserId;
                 await _houseService.AddCommentAsync(houseId, content, userId);
                 return Ok(new { Message = "Comment added successfully." });
             }
@@ -194,16 +225,22 @@ namespace HouseRentingAPI.Controllers
             }
         }
 
-        // PUT: api/Houses/{houseId}/comments/{commentId}
-        [HttpPut("{houseId}/comments/{commentId}")]
-        public async Task<IActionResult> UpdateComment(Guid houseId, Guid commentId, [FromBody] Comment comment)
+        // PUT: api/Houses/comments/{commentId}
+        [AllowAnonymous]
+        [HttpPut("/comments/{commentId}")]
+        public async Task<IActionResult> UpdateComment(Guid commentId, [FromBody] CommentUpdateDto commentUpdateDto)
         {
             try
             {
-                if (commentId != comment.CommentId || houseId != comment.HouseId)
-                    return BadRequest("Invalid comment ID or house ID.");
+                if (commentId != commentUpdateDto.CommentId)
+                    return BadRequest("Invalid comment ID.");
 
-                await _houseService.UpdateCommentAsync(comment);
+                // 提取要更新的評論文本
+                string commentText = commentUpdateDto.CommentText;
+
+                // 呼叫服務方法來更新評論
+                await _houseService.UpdateCommentAsync(commentId, commentText);
+
                 return Ok(new { Message = "Comment updated successfully." });
             }
             catch (Exception ex)
@@ -212,9 +249,10 @@ namespace HouseRentingAPI.Controllers
             }
         }
 
-        // DELETE: api/Houses/{houseId}/comments/{commentId}
+        // DELETE: api/Houses/comments/{commentId}
+        [AllowAnonymous]
         [HttpDelete("{houseId}/comments/{commentId}")]
-        public async Task<IActionResult> DeleteComment(Guid houseId, Guid commentId)
+        public async Task<IActionResult> DeleteComment(Guid commentId)
         {
             try
             {

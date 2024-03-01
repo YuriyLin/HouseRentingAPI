@@ -8,9 +8,9 @@ namespace HouseRentingAPI.Interface
     {
         Task<List<GetHouseDto>> GetAllHouses();
         Task<List<House>> SearchHouses(string keyword);
-        Task<CommentAddDto> AddCommentAsync(Guid houseId, string content, Guid userId);
+        Task<CommentDto> AddCommentAsync(Guid houseId, string content, Guid userId);
         Task<List<Comment>> GetCommentsByHouseIdAsync(Guid houseId);
-        Task UpdateCommentAsync(Comment comment);
+        Task UpdateCommentAsync(Guid commentId, string comment);
         Task DeleteCommentAsync(Guid commentId);
     }
 }

@@ -26,10 +26,15 @@ namespace HouseRentingAPI.Configuration
             CreateMap<House, HouseAddDto>().ReverseMap();
             CreateMap<House, UpdateHouseDto>().ReverseMap();
             CreateMap<House, GetHouseDto>().ReverseMap();
-            CreateMap<House, GetHouseByIdDto>().ReverseMap();
+            CreateMap<House, GetHouseByIdDto>()
+                .ForMember(dest => dest.FacilityIDs, opt => opt.MapFrom(src => src.HouseFacilities.Select(f => f.FacilityID).ToList()))
+                .ForMember(dest => dest.AttributeIDs, opt => opt.MapFrom(src => src.HouseOtherAttributes.Select(a => a.AttributeID).ToList()))
+                .ForMember(dest => dest.Landlordname, opt => opt.MapFrom(src => src.Landlord.Landlordname));
+
 
             CreateMap<Favorite, FavoriteDto>().ReverseMap();
-            CreateMap<Comment, CommentAddDto>().ReverseMap();
+            CreateMap<Comment, CommentDto>().ReverseMap();
+            CreateMap<Comment, CommentUpdateDto>().ReverseMap();
         }
     }
 }

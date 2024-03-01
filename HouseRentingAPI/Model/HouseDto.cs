@@ -22,11 +22,11 @@ namespace HouseRentingAPI.Model
         public HouseOtherAttribute HouseOtherAttributes { get; set; }
         public Favorite Favorites { get; set; }
         public ComparisonList ComparisonLists { get; set; }
+        public Comment Comment { get; set; }
     }
 
     public class HouseAddDto
     {
-        public Guid? HouseID { get; set; }
         [Required]
         public string Housename {  get; set; }
         [Required]
@@ -77,9 +77,10 @@ namespace HouseRentingAPI.Model
         public int Price { get; set; }
         public int? Distance { get; set; }
         public string Landlordname { get; set; }
-        public int PropertyTypeID { get; set; }
+        public string PropertyTypeName { get; set; }
         public List<int> FacilityIDs { get; set; }
         public List<int> AttributeIDs { get; set; }
+        public List<string> Comments { get; set; }
     }
 
 }

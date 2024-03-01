@@ -57,7 +57,7 @@ namespace HouseRentingAPI.Service
                 .ToListAsync();
         }
 
-        public async Task<CommentAddDto> AddCommentAsync(Guid houseId, string content, Guid userId)
+        public async Task<CommentDto> AddCommentAsync(Guid houseId, string content, Guid userId)
         {
             // 创建评论对象
             var comment = new Comment
@@ -72,7 +72,7 @@ namespace HouseRentingAPI.Service
             await _commentService.AddAsync(comment);
 
             // 使用 AutoMapper 将评论对象映射为 CommentAddDto 对象
-            var commentDto = _mapper.Map<CommentAddDto>(comment);
+            var commentDto = _mapper.Map<CommentDto>(comment);
 
             // 将 UTC 时间转换为台湾标准时间并进行格式化
             var taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
@@ -87,8 +87,14 @@ namespace HouseRentingAPI.Service
             return await _commentService.GetCommentsByHouseIdAsync(houseId);
         }
 
-        public async Task UpdateCommentAsync(Comment comment)
+        public async Task UpdateCommentAsync(Guid commentId, string commentText)
         {
+            var comment = await _commentService.GetAsync(commentId);
+            if (comment == null)
+            {
+                throw new Exception("Comment not found.");
+            }
+            comment.CommentText = commentText;
             await _commentService.UpdateAsync(comment);
         }
 
