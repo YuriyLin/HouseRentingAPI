@@ -88,11 +88,18 @@ namespace HouseRentingAPI.Controllers
         // Get:api/Houses/Search/{keyword}  
         [AllowAnonymous]
         [HttpGet("Search")]
-        public async Task<ActionResult<IEnumerable<GetHouseDto>>> SearchHouses([FromQuery][Required] string keyword)
+        public async Task<ActionResult<IEnumerable<GetHouseDto>>> SearchHouses(
+            [FromQuery][Required] string keyword,
+            [FromQuery] int propertyTypeID = 0,
+            [FromQuery] List<int>? facilityIDs = null,
+            [FromQuery] List<int>? attributeIDs = null,
+            [FromQuery] int minPrice = 0,
+            [FromQuery] int maxPrice = 0)
         {
             try
             {
-                var result = await _houseService.SearchHouses(keyword);
+                //_houseService.SearchHouses 方法时，我们通过空值合并运算符 (??) 将 null 参数转换为空列表。
+                var result = await _houseService.SearchHouses(keyword, propertyTypeID, facilityIDs ?? new List<int>(), attributeIDs ?? new List<int>(), minPrice, maxPrice);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -137,7 +144,12 @@ namespace HouseRentingAPI.Controllers
                     house.HouseOtherAttributes.Add(new HouseOtherAttribute { HouseID = houseID, AttributeID = attributeId });
                 }
             }
-           
+
+            foreach (var photoFile in houseAddDto.HousePhotos)
+            {
+                await _houseService.SaveHousePhotoAsync(houseID, photoFile, false); // 将 isCoverPhoto 参数设置为 false
+            }
+
             // 更新 house
             await _houseService.UpdateAsync(house);
             return CreatedAtAction("GetHouseById", new { id = house.HouseID }, _mapper.Map<GetHouseByIdDto>(house));
@@ -206,7 +218,7 @@ namespace HouseRentingAPI.Controllers
         }
 
         //-----------Comment-------------------(Add/Update/Delete)
-        // POST: api/Houses/{houseId}/comments
+        // POST: api/Houses/comments
         [AllowAnonymous]
         [HttpPost("comments")]
         public async Task<IActionResult> AddComment([FromBody] CommentDto commentDto)

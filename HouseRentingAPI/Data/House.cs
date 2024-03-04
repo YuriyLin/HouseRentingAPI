@@ -30,6 +30,7 @@ namespace HouseRentingAPI.Data
         public ICollection<Favorite> Favorites { get; set; }
         public ICollection<Comment> Comments { get; set; }
         public ICollection<ComparisonList> ComparisonLists { get; set; }
+        public ICollection<HousePhoto> HousePhotos { get; set; }
     }
 
     public class HouseFacility
@@ -79,5 +80,26 @@ namespace HouseRentingAPI.Data
         [Required]
         public string AttributeName { get; set; }
         public ICollection<HouseOtherAttribute> HouseOtherAttributes { get; set; }
+    }
+    public class Photo
+    {
+        [Key]
+        public Guid PhotoID { get; set; }
+        public string PhotoURL { get; set; }
+    }
+
+    public class HousePhoto
+    {
+        [Key]
+        public Guid HousePhotoID { get; set; }
+        public Guid HouseID { get; set; }
+        public Guid PhotoID { get; set; }
+        public bool IsCoverPhoto { get; set; }
+
+        [ForeignKey("HouseID")]
+        public House House { get; set; }
+
+        [ForeignKey("PhotoID")]
+        public Photo Photo { get; set; }
     }
 }

@@ -21,6 +21,8 @@ namespace HouseRentingAPI.Data
         public DbSet<Favorite> Favorites { get; set; }
         public DbSet<ComparisonList> ComparisonLists { get; set; }
         public DbSet<Comment> Comment { get; set; }
+        public DbSet<HousePhoto> HousesPhoto { get; set; }
+        public DbSet<Photo> Photos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -101,6 +103,18 @@ namespace HouseRentingAPI.Data
             // Favorite has composite primary key
             modelBuilder.Entity<Favorite>()
                 .HasKey(f => new { f.HouseID, f.UserID });
+
+            // HousePhoto to House (many-to-one)
+            modelBuilder.Entity<HousePhoto>()
+                .HasOne(hp => hp.House)
+                .WithMany(h => h.HousePhotos)
+                .HasForeignKey(hp => hp.HouseID);
+
+            // HousePhoto to Photo (many-to-one)
+            modelBuilder.Entity<HousePhoto>()
+                .HasOne(hp => hp.Photo)
+                .WithMany()
+                .HasForeignKey(hp => hp.PhotoID);
         }
     }
 }

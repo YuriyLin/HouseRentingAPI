@@ -35,6 +35,7 @@ namespace HouseRentingAPI.Service
             return await _context.Houses
                 .Select(h => new GetHouseDto
                 {
+                    HouseID = h.HouseID,
                     Housename = h.HouseName,
                     Address = h.Address,
                     PropertyTypeName = h.PropertyType.TypeName,
@@ -44,18 +45,98 @@ namespace HouseRentingAPI.Service
                 .ToListAsync();
         }
 
-        public async Task<List<House>> SearchHouses(string keyword)
+        public async Task<List<GetHouseDto>> SearchHouses(string? keyword, int propertyTypeID, List<int> facilityIDs, List<int> attributeIDs, int minPrice, int maxPrice)
         {
-            return await _context.Houses
-                .Where(h => EF.Functions.Like(h.HouseName, $"%{keyword}%") ||
-                            EF.Functions.Like(h.Address, $"%{keyword}%") ||
-                            EF.Functions.Like(h.PropertyType.TypeName, $"%{keyword}%") ||
-                            EF.Functions.Like(h.Description, $"%{keyword}%") ||
-                            h.HouseFacilities.Any(hf => EF.Functions.Like(hf.Facility.FacilityName, $"%{keyword}%")) ||
-                            h.HouseOtherAttributes.Any(hoa => EF.Functions.Like(hoa.OtherAttribute.AttributeName, $"%{keyword}%"))
-                )
+            var query = _context.Houses.AsQueryable();
+
+            // 根据关键字进行过滤
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                query = query.Where(h => EF.Functions.Like(h.HouseName, $"%{keyword}%") ||
+                                         EF.Functions.Like(h.Address, $"%{keyword}%") ||
+                                         EF.Functions.Like(h.PropertyType.TypeName, $"%{keyword}%") ||
+                                         EF.Functions.Like(h.Description, $"%{keyword}%"));
+            }
+
+            // 根据设施ID进行过滤
+            if (facilityIDs != null && facilityIDs.Any())
+            {
+                query = query.Where(h => h.HouseFacilities.Any(hf => facilityIDs.Contains(hf.FacilityID)));
+            }
+
+            // 根据属性ID进行过滤
+            if (attributeIDs != null && attributeIDs.Any())
+            {
+                query = query.Where(h => h.HouseOtherAttributes.Any(hoa => attributeIDs.Contains(hoa.OtherAttribute.AttributeID)));
+            }
+
+            // 根据 PropertyTypeID 进行过滤
+            if (propertyTypeID > 0)
+            {
+                query = query.Where(h => h.PropertyTypeID == propertyTypeID);
+            }
+
+            // 根据价格范围进行过滤
+            if (minPrice > 0)
+            {
+                query = query.Where(h => h.Price >= minPrice);
+            }
+            if (maxPrice > 0)
+            {
+                query = query.Where(h => h.Price <= maxPrice);
+            }
+
+            var result = await query
+                .Select(h => new GetHouseDto
+                {
+                    HouseID = h.HouseID,
+                    Housename = h.HouseName,
+                    Address = h.Address,
+                    PropertyTypeName = h.PropertyType.TypeName,
+                    SquareFeet = h.SquareFeet,
+                    Price = h.Price
+                })
                 .ToListAsync();
+
+            return result;
         }
+        public async Task SaveHousePhotoAsync(Guid houseId, IFormFile photoFile, bool isCoverPhoto)
+        {
+            // 指定上传文件的保存路径
+            var uploadDirectory = @"C:\Users\USER\Downloads\HouseRentingAPI\HouseRentingAPI\Housephoto";
+
+            // 创建上传目录
+            if (!Directory.Exists(uploadDirectory))
+            {
+                Directory.CreateDirectory(uploadDirectory);
+            }
+
+            // 生成文件名并拼接文件路径
+            var fileName = $"{Guid.NewGuid().ToString()}{Path.GetExtension(photoFile.FileName)}";
+            var filePath = Path.Combine(uploadDirectory, fileName);
+
+            // 将文件保存到指定路径
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await photoFile.CopyToAsync(stream);
+            }
+
+            // 将文件路径保存到数据库中的Photo表
+            var photo = new Photo { PhotoURL = filePath };
+            _context.Photos.Add(photo);
+            await _context.SaveChangesAsync();
+
+            // 将房屋照片信息保存到数据库中的HousePhoto表
+            var housePhoto = new HousePhoto
+            {
+                HouseID = houseId,
+                PhotoID = photo.PhotoID,
+                IsCoverPhoto = isCoverPhoto
+            };
+            _context.HousesPhoto.Add(housePhoto);
+            await _context.SaveChangesAsync();
+        }
+
 
         public async Task<CommentDto> AddCommentAsync(Guid houseId, string content, Guid userId)
         {

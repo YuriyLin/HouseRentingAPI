@@ -43,6 +43,7 @@ namespace HouseRentingAPI.Model
         public int PropertyTypeID { get; set; }
         public List<int> FacilityIDs { get; set; }
         public List<int> AttributeIDs { get; set; }
+        public List<IFormFile> HousePhotos { get; set; }
     }
 
     public class UpdateHouseDto
@@ -62,6 +63,7 @@ namespace HouseRentingAPI.Model
 
     public class GetHouseDto
     {
+        public Guid HouseID { get; set; }
         public string Housename { get;set; }
         public string Address { get; set; }
         public string PropertyTypeName { get; set; }
