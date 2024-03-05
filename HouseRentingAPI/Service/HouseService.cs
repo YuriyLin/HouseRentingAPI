@@ -121,12 +121,12 @@ namespace HouseRentingAPI.Service
                 await photoFile.CopyToAsync(stream);
             }
 
-            // 将文件路径保存到数据库中的Photo表
+            // 將照片路徑保存到數據庫中的Photo表
             var photo = new Photo { PhotoURL = filePath };
             _context.Photos.Add(photo);
             await _context.SaveChangesAsync();
 
-            // 将房屋照片信息保存到数据库中的HousePhoto表
+            // 將房屋照片訊息保存到數據庫中的HousePhoto表
             var housePhoto = new HousePhoto
             {
                 HouseID = houseId,

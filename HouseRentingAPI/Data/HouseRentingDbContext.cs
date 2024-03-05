@@ -108,7 +108,8 @@ namespace HouseRentingAPI.Data
             modelBuilder.Entity<HousePhoto>()
                 .HasOne(hp => hp.House)
                 .WithMany(h => h.HousePhotos)
-                .HasForeignKey(hp => hp.HouseID);
+                .HasForeignKey(hp => hp.HouseID)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // HousePhoto to Photo (many-to-one)
             modelBuilder.Entity<HousePhoto>()
