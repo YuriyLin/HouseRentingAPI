@@ -145,9 +145,12 @@ namespace HouseRentingAPI.Controllers
                 }
             }
 
+            bool isFirstPhoto = true;
             foreach (var photoFile in houseAddDto.HousePhotos)
             {
-                await _houseService.SaveHousePhotoAsync(houseID, photoFile, false); // 将 isCoverPhoto 参数设置为 false
+                await _houseService.SaveHousePhotoAsync(houseID, photoFile, isFirstPhoto);
+                //將第一張照片設置為封面照片，其餘照片為非封面照片
+                isFirstPhoto = false;
             }
 
             // 更新 house
@@ -206,6 +209,27 @@ namespace HouseRentingAPI.Controllers
             {
                 return NotFound();
             }
+
+            // 獲取房屋的所有相關照片
+            var housePhotos = await _context.HousesPhoto
+                .Include(hp => hp.Photo)
+                .Where(hp => hp.HouseID == id)
+                .ToListAsync();
+
+            // 逐一刪除房屋的相關照片
+            foreach (var photo in housePhotos)
+            {
+                // 刪除照片文件
+                if (!string.IsNullOrEmpty(photo.Photo.PhotoURL) && System.IO.File.Exists(photo.Photo.PhotoURL))
+                {
+                    System.IO.File.Delete(photo.Photo.PhotoURL);
+                }
+
+                // 從數據庫中刪除 HousePhoto 記錄
+                _context.HousesPhoto.Remove(photo);
+            }
+
+            await _context.SaveChangesAsync();
 
             await _houseService.DeleteAsync(id);
 

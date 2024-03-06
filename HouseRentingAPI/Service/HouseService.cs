@@ -32,7 +32,8 @@ namespace HouseRentingAPI.Service
 
         public async Task<List<GetHouseDto>> GetAllHouses()
         {
-            return await _context.Houses
+            var houses = await _context.Houses
+                .Include(h => h.HousePhotos)
                 .Select(h => new GetHouseDto
                 {
                     HouseID = h.HouseID,
@@ -40,9 +41,12 @@ namespace HouseRentingAPI.Service
                     Address = h.Address,
                     PropertyTypeName = h.PropertyType.TypeName,
                     SquareFeet = h.SquareFeet,
-                    Price = h.Price
+                    Price = h.Price,
+                    CoverPhotoUrl = h.HousePhotos.FirstOrDefault(p => p.IsCoverPhoto).Photo.PhotoURL
                 })
                 .ToListAsync();
+
+            return houses;
         }
 
         public async Task<List<GetHouseDto>> SearchHouses(string? keyword, int propertyTypeID, List<int> facilityIDs, List<int> attributeIDs, int minPrice, int maxPrice)
@@ -123,7 +127,7 @@ namespace HouseRentingAPI.Service
 
             // 將照片路徑保存到數據庫中的Photo表
             var photo = new Photo { PhotoURL = filePath };
-            _context.Photos.Add(photo);
+            _context.Photo.Add(photo);
             await _context.SaveChangesAsync();
 
             // 將房屋照片訊息保存到數據庫中的HousePhoto表

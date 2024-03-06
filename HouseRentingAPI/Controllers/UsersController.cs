@@ -9,6 +9,7 @@ using HouseRentingAPI.Data;
 using HouseRentingAPI.Model;
 using AutoMapper;
 using HouseRentingAPI.Constract;
+using System.IO;
 using System.Diagnostics.Metrics;
 
 namespace HouseRentingAPI.Controllers
@@ -184,6 +185,11 @@ namespace HouseRentingAPI.Controllers
             }
 
             await _userService.DeleteAsync(id);
+
+            if (!string.IsNullOrEmpty(user.StudentIdCardPath) && System.IO.File.Exists(user.StudentIdCardPath))
+            {
+                System.IO.File.Delete(user.StudentIdCardPath);
+            }
 
             return Ok(new { Message = "該用戶已刪除" });
         }

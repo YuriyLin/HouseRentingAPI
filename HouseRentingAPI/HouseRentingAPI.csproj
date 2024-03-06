@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <Folder Include="Housephoto\" />
+    <Folder Include="UploadStuIDCard\" />
   </ItemGroup>
 
 </Project>

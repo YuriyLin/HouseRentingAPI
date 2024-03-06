@@ -92,8 +92,9 @@ namespace HouseRentingAPI.Data
     {
         [Key]
         public Guid HousePhotoID { get; set; }
-        public Guid HouseID { get; set; }
+        [Key]
         public Guid PhotoID { get; set; }
+        public Guid HouseID { get; set; }
         public bool IsCoverPhoto { get; set; }
 
         [ForeignKey("HouseID")]

@@ -69,6 +69,7 @@ namespace HouseRentingAPI.Model
         public string PropertyTypeName { get; set; }
         public string SquareFeet { get; set; }
         public int Price { get; set; }
+        public string CoverPhotoUrl { get; set; }
     }
 
     public class GetHouseByIdDto

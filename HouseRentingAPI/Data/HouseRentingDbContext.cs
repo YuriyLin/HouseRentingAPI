@@ -22,7 +22,7 @@ namespace HouseRentingAPI.Data
         public DbSet<ComparisonList> ComparisonLists { get; set; }
         public DbSet<Comment> Comment { get; set; }
         public DbSet<HousePhoto> HousesPhoto { get; set; }
-        public DbSet<Photo> Photos { get; set; }
+        public DbSet<Photo> Photo { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -115,7 +115,12 @@ namespace HouseRentingAPI.Data
             modelBuilder.Entity<HousePhoto>()
                 .HasOne(hp => hp.Photo)
                 .WithMany()
-                .HasForeignKey(hp => hp.PhotoID);
+                .HasForeignKey(hp => hp.PhotoID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //HousePhoto has composite primary key
+            modelBuilder.Entity<HousePhoto>()
+                .HasKey(hp => new { hp.HouseID, hp.PhotoID });
         }
     }
 }
