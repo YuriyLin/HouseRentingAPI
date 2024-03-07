@@ -91,9 +91,8 @@ namespace HouseRentingAPI.Data
     public class HousePhoto
     {
         [Key]
-        public Guid HousePhotoID { get; set; }
-        [Key]
         public Guid PhotoID { get; set; }
+        [Key]
         public Guid HouseID { get; set; }
         public bool IsCoverPhoto { get; set; }
 

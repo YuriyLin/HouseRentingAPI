@@ -40,9 +40,9 @@ namespace HouseRentingAPI.Controllers
             return Ok(favorites);
         }
 
-        // POST: api/Favorites/Add/{userid}
-        [HttpPost("Add/{userid}")]
-        public async Task<IActionResult> AddToFavorite([FromRoute]Guid userId, [FromBody] Guid houseId)
+        // POST: api/Favorites/Add/{userid/{houseId}}
+        [HttpPost("Add/{userid}/{houseId}")]
+        public async Task<IActionResult> AddToFavorite([FromRoute]Guid userId, [FromRoute] Guid houseId)
         {
             try
             {
@@ -63,8 +63,8 @@ namespace HouseRentingAPI.Controllers
         }
 
         // DELETE : api/Favorites/Remove/{userid}
-        [HttpDelete("Remove/{userId}")]
-        public async Task<IActionResult> RemoveFromFavorites([FromRoute]Guid userId, [FromBody] Guid houseId)
+        [HttpDelete("Remove/{userId}/{houseId}")]
+        public async Task<IActionResult> RemoveFromFavorites([FromRoute]Guid userId, [FromRoute] Guid houseId)
         {
             try
             {

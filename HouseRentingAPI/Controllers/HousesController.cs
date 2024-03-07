@@ -227,6 +227,7 @@ namespace HouseRentingAPI.Controllers
 
                 // 從數據庫中刪除 HousePhoto 記錄
                 _context.HousesPhoto.Remove(photo);
+                _context.Photo.Remove(photo.Photo);
             }
 
             await _context.SaveChangesAsync();
