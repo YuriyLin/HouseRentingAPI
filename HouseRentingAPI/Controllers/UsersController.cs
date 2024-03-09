@@ -9,8 +9,10 @@ using HouseRentingAPI.Data;
 using HouseRentingAPI.Model;
 using AutoMapper;
 using HouseRentingAPI.Constract;
+using System.Security.Cryptography;
 using System.IO;
 using System.Diagnostics.Metrics;
+using System.Text;
 
 namespace HouseRentingAPI.Controllers
 {
@@ -160,18 +162,27 @@ namespace HouseRentingAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = await _userService.loginAsync(userLoginDto);
-
-            if (user != null)
+            using (var sha256 = SHA256.Create())
             {
-                return Ok(new { Message = "登入成功", UserId = user.Id});
-            }
+                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(userLoginDto.Password));
+                var hash = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
 
-            else
-            {
-                return BadRequest(new { Message = "登入失敗" });
+                // 根據用戶名稱查詢用戶
+                var user = await _userService.loginAsync(userLoginDto);
+
+                // 比較雜湊後的密碼是否匹配
+                if (user != null && user.Password == hash)
+                {
+                    return Ok(new { Message = "登入成功", UserId = user.Id });
+                }
+                else
+                {
+                    return BadRequest(new { Message = "登入失敗"});
+                }
             }
         }
+
+
 
         // Delete User
         // DELETE : api/Users/{id}

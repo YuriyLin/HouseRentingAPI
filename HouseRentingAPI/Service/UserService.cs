@@ -4,6 +4,9 @@ using HouseRentingAPI.Constract;
 using HouseRentingAPI.Data;
 using HouseRentingAPI.Model;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.Intrinsics.Arm;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace HouseRentingAPI.Service
 {
@@ -27,7 +30,7 @@ namespace HouseRentingAPI.Service
 
         public async Task<User> loginAsync(UserLoginDto userLoginDto)
         {
-            return await _context.User.FirstOrDefaultAsync(u => u.StuId == userLoginDto.StuId && u.Password == userLoginDto.Password);
+            return await _context.User.FirstOrDefaultAsync(u => u.StuId == userLoginDto.StuId);
         }
 
         public async Task RegisterAsync(UserRegisterDto userRegisterDto)
@@ -37,6 +40,18 @@ namespace HouseRentingAPI.Service
             {
                 throw new Exception("此學號已被使用");
             }
+
+            //將密碼進行雜湊加密
+            using (var sha256 = SHA256.Create())
+            {
+                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(userRegisterDto.Password));
+                var hash = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+
+                // 保存加密後的密碼到用戶對象中
+                userRegisterDto.Password = hash;
+            }
+
+
 
             if (userRegisterDto.StudentIdCard != null && userRegisterDto.StudentIdCard.Length > 0)
             {

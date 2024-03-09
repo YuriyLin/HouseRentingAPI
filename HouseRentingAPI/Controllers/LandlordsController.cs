@@ -9,6 +9,8 @@ using HouseRentingAPI.Data;
 using AutoMapper;
 using HouseRentingAPI.Interface;
 using HouseRentingAPI.Model;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace HouseRentingAPI.Controllers
 {
@@ -159,16 +161,23 @@ namespace HouseRentingAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            var landlord = await _landlordService.loginAsync(landlordLoginDto);
-
-            if (landlord != null)
+            using (var sha256 = SHA256.Create())
             {
-                return Ok(new { Message = "登入成功", LandlordId = landlord.LandlordID });
-            }
+                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(landlordLoginDto.Password));
+                var hash = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
 
-            else
-            {
-                return BadRequest(new { Message = "登入失敗" });
+                // 根據用戶名稱查詢用戶
+                var landlord = await _landlordService.loginAsync(landlordLoginDto);
+
+                // 比較雜湊後的密碼是否匹配
+                if (landlord != null && landlord.Password == hash)
+                {
+                    return Ok(new { Message = "登入成功", LandlordId = landlord.LandlordID });
+                }
+                else
+                {
+                    return BadRequest(new { Message = "登入失敗" });
+                }
             }
         }
 
