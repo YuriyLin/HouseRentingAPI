@@ -8,5 +8,6 @@ namespace HouseRentingAPI.Interface
     {
         Task<Landlord> loginAsync(LandlordLoginDto landlordLoginDto);
         Task RegisterAsync(LandlordRegisterDto landlordRegisterDto);
+        Task<String> UpdateLandlordPasswordAsync(Guid userId, UpdateLandlordPasswordDto updateLandlordPasswordDto);
     }
 }

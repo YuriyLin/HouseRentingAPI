@@ -94,47 +94,18 @@ namespace HouseRentingAPI.Controllers
         // landlord password update
         // PUT: api/Landlords/updatepassword/{id}
         [HttpPut("updatepassword/{id}")]
-        public async Task<IActionResult> UpdateLandlordPassword(Guid id,  UpdateLandlordPasswordDto updateLandlordPasswordDto)
+        public async Task<IActionResult> UpdateUserPassword(Guid id, UpdateLandlordPasswordDto updateLandlordPasswordDto)
         {
-            var landlord = await _landlordService.GetAsync(id);
+            var errorMessage = await _landlordService.UpdateLandlordPasswordAsync(id, updateLandlordPasswordDto);
 
-            if (landlord == null)
+            if (string.IsNullOrEmpty(errorMessage))
             {
-                return NotFound();
+                return Ok(new { Message = "密碼已更新" });
             }
-
-            // 檢查舊密碼是否正確
-            if (landlord.Password != updateLandlordPasswordDto.OldPassword)
+            else
             {
-                return BadRequest(new { Message = "舊密碼不正確" });
+                return BadRequest(new { Message = errorMessage });
             }
-
-            // 檢查新密碼和確認新密碼是否一致
-            if (updateLandlordPasswordDto.NewPassword != updateLandlordPasswordDto.ConfirmNewPassword)
-            {
-                return BadRequest(new { Message = "密碼不一致" });
-            }
-
-            // 更新密碼
-            landlord.Password = updateLandlordPasswordDto.NewPassword;
-
-            try
-            {
-                await _landlordService.UpdateAsync(landlord);
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await LandlordExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return Ok(new { Message = "密碼已更新" });
         }
 
         // POST: api/Landlords/register

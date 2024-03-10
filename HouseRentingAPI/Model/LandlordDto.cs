@@ -49,7 +49,6 @@ namespace HouseRentingAPI.Model
 
     public class UpdateLandlordPasswordDto
     {
-        public Guid LandlordID { get; set; }
         public string OldPassword { get; set; }
         public string NewPassword { get; set; }
         public string ConfirmNewPassword { get; set; }

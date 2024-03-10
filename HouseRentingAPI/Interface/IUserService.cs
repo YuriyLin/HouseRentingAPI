@@ -8,5 +8,6 @@ namespace HouseRentingAPI.Constract
     {
         Task<User> loginAsync(UserLoginDto userLoginDto);
         Task RegisterAsync(UserRegisterDto userRegisterDto);
+        Task<String> UpdateUserPasswordAsync(Guid userId, UpdateUserPasswordDto updateuserPasswordDto);
     }
 }

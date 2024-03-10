@@ -95,46 +95,18 @@ namespace HouseRentingAPI.Controllers
         [HttpPut("updatepassword/{id}")]
         public async Task<IActionResult> UpdateUserPassword(Guid id, UpdateUserPasswordDto updateuserPasswordDto)
         {
-            var user = await _userService.GetAsync(id);
+            var errorMessage = await _userService.UpdateUserPasswordAsync(id, updateuserPasswordDto);
 
-            if (user == null)
+            if (string.IsNullOrEmpty(errorMessage))
             {
-                return NotFound();
+                return Ok(new { Message = "密碼已更新" });
             }
-
-            // 檢查舊密碼是否正確
-            if (user.Password != updateuserPasswordDto.OldPassword)
+            else
             {
-                return BadRequest(new { Message = "舊密碼不正確" });
+                return BadRequest(new { Message = errorMessage });
             }
-
-            // 檢查新密碼和確認新密碼是否一致
-            if (updateuserPasswordDto.NewPassword != updateuserPasswordDto.ConfirmNewPassword)
-            {
-                return BadRequest(new { Message = "密碼不一致" });
-            }
-
-            // 更新密碼
-            user.Password = updateuserPasswordDto.NewPassword;
-
-            try
-            {
-                await _userService.UpdateAsync(user);
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return Ok(new { Message = "密碼已更新" });
         }
+
 
         // User Register
         // POST:api/Users/register

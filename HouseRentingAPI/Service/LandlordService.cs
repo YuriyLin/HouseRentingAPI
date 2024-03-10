@@ -52,6 +52,39 @@ namespace HouseRentingAPI.Service
             _context.Landlords.Add(landlord);
             await _context.SaveChangesAsync();
         }
+        public async Task<String> UpdateLandlordPasswordAsync(Guid userId, UpdateLandlordPasswordDto updateLandlordPasswordDto)
+        {
+            // 檢查舊密碼是否正確
+            // 如果舊密碼不正確，返回 false
+            // 否則，使用相同的加密方法對新密碼進行處理，並更新密碼
+            // 如果更新成功，返回 true，否則返回 false
 
+            using (var sha256 = SHA256.Create())
+            {
+                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(updateLandlordPasswordDto.OldPassword));
+                var oldPasswordHash = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+
+                var landlord = await _context.Landlords.FindAsync(userId);
+
+                if (landlord == null || landlord.Password != oldPasswordHash)
+                {
+                    return "找不到房東或舊密碼不正確";
+                }
+
+                if (updateLandlordPasswordDto.NewPassword != updateLandlordPasswordDto.ConfirmNewPassword)
+                {
+                    return "新密碼和確認新密碼不一致";
+                }
+
+                var newHashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(updateLandlordPasswordDto.NewPassword));
+                var newPasswordHash = BitConverter.ToString(newHashedBytes).Replace("-", "").ToLower();
+
+                landlord.Password = newPasswordHash;
+
+                await _context.SaveChangesAsync();
+
+                return "";
+            }
+        }
     }
 }
