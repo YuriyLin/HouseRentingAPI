@@ -73,8 +73,8 @@ namespace HouseRentingAPI.Controllers
                 Address = house.Address,
                 Description = house.Description,
                 Price = house.Price,
-                Distance = house.Distance,
                 Landlordname = house.Landlord.Landlordname,
+                lineID = house.Landlord.LineID,
                 PropertyTypeName = house.PropertyType.TypeName,
                 FacilityIDs = house.HouseFacilities.Select(f => f.FacilityID).ToList(),
                 AttributeIDs = house.HouseOtherAttributes.Select(a => a.AttributeID).ToList(),
@@ -91,15 +91,18 @@ namespace HouseRentingAPI.Controllers
         public async Task<ActionResult<IEnumerable<GetHouseDto>>> SearchHouses(
             [FromQuery][Required] string keyword,
             [FromQuery] int propertyTypeID = 0,
-            [FromQuery] List<int>? facilityIDs = null,
-            [FromQuery] List<int>? attributeIDs = null,
+            [FromQuery] string? facilityIDs = null,
+            [FromQuery] string? attributeIDs = null,
             [FromQuery] int minPrice = 0,
             [FromQuery] int maxPrice = 0)
         {
             try
             {
-                //_houseService.SearchHouses 方法时，我们通过空值合并运算符 (??) 将 null 参数转换为空列表。
-                var result = await _houseService.SearchHouses(keyword, propertyTypeID, facilityIDs ?? new List<int>(), attributeIDs ?? new List<int>(), minPrice, maxPrice);
+                // 将逗号分隔的字符串拆分为列表
+                List<int>? facilityIDsList = facilityIDs?.Split(',').Select(int.Parse).ToList();
+                List<int>? attributeIDsList = attributeIDs?.Split(',').Select(int.Parse).ToList();
+
+                var result = await _houseService.SearchHouses(keyword, propertyTypeID, facilityIDsList, attributeIDsList, minPrice, maxPrice);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -151,7 +154,7 @@ namespace HouseRentingAPI.Controllers
                 await _houseService.SaveHousePhotoAsync(houseID, photoFile, isFirstPhoto);
                 //將第一張照片設置為封面照片，其餘照片為非封面照片
                 isFirstPhoto = false;
-            }
+            } 
 
             // 更新 house
             await _houseService.UpdateAsync(house);

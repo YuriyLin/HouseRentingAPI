@@ -10,7 +10,6 @@ namespace HouseRentingAPI.Model
         public Guid LandlordID { get; set; }
         public int PropertyTypeID { get; set; }
         public int Price { get; set; }
-        public int Distance { get; set; }
         public string HouseName { get; set; }
         public string Address { get; set; }
         public string SquareFeet { get; set; }
@@ -35,9 +34,8 @@ namespace HouseRentingAPI.Model
         public string? Description { get; set; }
         [Required]
         public int Price { get; set; }
-        public int? Distance { get; set; }
         [Required]
-        public string SquareFeet { get; set; }
+        public string Squarefeet { get; set; }
         public Guid LandlordID { get; set; }
         [Required]
         public int PropertyTypeID { get; set; }
@@ -53,7 +51,6 @@ namespace HouseRentingAPI.Model
         public string? Address { get; set; }
         public string? Description { get; set; }
         public int? Price { get; set; }
-        public int? Distance { get; set; }
         public string? SquareFeet { get; set; }
         public Guid LandlordID { get; set; }
         public int? PropertyTypeID { get; set; }
@@ -78,8 +75,8 @@ namespace HouseRentingAPI.Model
         public string Address { get; set; }
         public string? Description { get; set; }
         public int Price { get; set; }
-        public int? Distance { get; set; }
         public string Landlordname { get; set; }
+        public string lineID {  get; set; }
         public string PropertyTypeName { get; set; }
         public List<int> FacilityIDs { get; set; }
         public List<int> AttributeIDs { get; set; }

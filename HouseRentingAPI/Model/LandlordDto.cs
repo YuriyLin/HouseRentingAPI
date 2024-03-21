@@ -18,7 +18,7 @@ namespace HouseRentingAPI.Model
         [Required]
         public string Phone { get; set; }
         [Required]
-        public string? LineId {  get; set; }
+        public string? LineID {  get; set; }
         [Required]
         public string Password { get; set; }
     }
@@ -40,11 +40,9 @@ namespace HouseRentingAPI.Model
 
     public class UpdateLandlordDto
     {
-        public Guid LandlordID { get; set; }
         public string? Landlordname { get; set; }
         public string? Phone { get; set; }
-        public string? LineId { get; set; }
-        public string? Password { get; set; }
+        public string? LineID { get; set; }
     }
 
     public class UpdateLandlordPasswordDto

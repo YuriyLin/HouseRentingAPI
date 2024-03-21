@@ -31,7 +31,8 @@ namespace HouseRentingAPI.Configuration
             CreateMap<House, GetHouseByIdDto>()
                 .ForMember(dest => dest.FacilityIDs, opt => opt.MapFrom(src => src.HouseFacilities.Select(f => f.FacilityID).ToList()))
                 .ForMember(dest => dest.AttributeIDs, opt => opt.MapFrom(src => src.HouseOtherAttributes.Select(a => a.AttributeID).ToList()))
-                .ForMember(dest => dest.Landlordname, opt => opt.MapFrom(src => src.Landlord.Landlordname));
+                .ForMember(dest => dest.Landlordname, opt => opt.MapFrom(src => src.Landlord.Landlordname))
+                .ForMember(dest => dest.lineID, opt => opt.MapFrom(src => src.Landlord.LineID));
             CreateMap<IFormFile, Photo>()
                 .ForMember(dest => dest.PhotoURL, opt => opt.MapFrom(src => src.FileName));
 

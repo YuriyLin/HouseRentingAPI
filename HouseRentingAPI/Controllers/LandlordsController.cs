@@ -58,11 +58,6 @@ namespace HouseRentingAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateLandlord(Guid id,  UpdateLandlordDto updateLandlordDto)
         {
-            if (id != updateLandlordDto.LandlordID)
-            {
-                return BadRequest("Invalid Record Id");
-            }
-
             var landlord = await _landlordService.GetAsync(id);
 
             if (landlord == null)
