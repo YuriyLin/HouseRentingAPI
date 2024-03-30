@@ -48,7 +48,7 @@ namespace HouseRentingAPI.Controllers
             {
                 if (_context.Favorites.Any(f => f.UserID == userId && f.HouseID == houseId))
                 {
-                    return BadRequest(new { Message = "房屋已在收藏列表中" });
+                    return Conflict(new { Message = "房屋已在收藏列表中" });
                 }
 
                 // 使用 Repository 將收藏記錄新增到資料庫

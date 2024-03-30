@@ -89,7 +89,7 @@ namespace HouseRentingAPI.Controllers
         [AllowAnonymous]
         [HttpGet("Search")]
         public async Task<ActionResult<IEnumerable<GetHouseDto>>> SearchHouses(
-            [FromQuery][Required] string keyword,
+            [FromQuery] string? keyword,
             [FromQuery] int propertyTypeID = 0,
             [FromQuery] string? facilityIDs = null,
             [FromQuery] string? attributeIDs = null,
