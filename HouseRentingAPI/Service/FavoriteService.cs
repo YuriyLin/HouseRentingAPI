@@ -33,6 +33,21 @@ namespace HouseRentingAPI.Service
             return favorites;
         }
 
+        public async Task<List<FavoriteDto>> GetHouseFavoritesAsync(Guid houseId)
+        {
+            var favorites = await _context.Favorites
+                .Where(f => f.HouseID == houseId)
+                .Select(f => new FavoriteDto
+                {
+                    Housename = f.House.HouseName,
+                    Address = f.House.Address,
+                    Price = f.House.Price,
+                })
+                .ToListAsync();
+
+            return favorites;
+        }
+
         public async Task AddFavoriteAsync(Guid userId, Guid houseId)
         {
             var favorite = new Favorite

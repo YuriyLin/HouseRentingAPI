@@ -48,6 +48,26 @@ namespace HouseRentingAPI.Service
 
             return houses;
         }
+        /*public async Task<List<GetHouseByIdDto>> GetHousesByLandlord(Guid landlordId)
+        {
+            var houses = await _context.Houses
+                .Include(h => h.PropertyType)
+                .Include(h => h.HousePhotos)
+                    .ThenInclude(hp => hp.Photo)
+                .Where(h => h.LandlordID == landlordId)
+                .Select(h => new GetHouseByIdDto
+                {
+                    Housename = h.HouseName,
+                    Address = h.Address,
+                    PropertyTypeName = h.PropertyType.TypeName,
+                    Squarefeet = h.SquareFeet,
+                    Price = h.Price,
+                    PhotoUrl = h.HousePhotos.Select(hp => hp.Photo.PhotoURL).ToList()
+                })
+                .ToListAsync();
+
+            return houses;
+        }*/
 
         public async Task<List<GetHouseDto>> SearchHouses(string? keyword, int propertyTypeID, List<int> facilityIDs, List<int> attributeIDs, int minPrice, int maxPrice)
         {

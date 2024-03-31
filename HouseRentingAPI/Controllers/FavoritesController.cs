@@ -40,6 +40,18 @@ namespace HouseRentingAPI.Controllers
             return Ok(favorites);
         }
 
+        // GET: api/Favorites/{houseId}
+        [HttpGet("house/{houseId}")]
+        public async Task<ActionResult<IEnumerable<FavoriteDto>>> GetHouseFavorites([FromRoute]Guid houseId)
+        {
+            var favorites = await _favoriteService.GetHouseFavoritesAsync(houseId);
+            if (favorites == null)
+            {
+                return NotFound();
+            }
+            return Ok(favorites);
+        }
+
         // POST: api/Favorites/Add/{userid/{houseId}}
         [HttpPost("Add/{userid}/{houseId}")]
         public async Task<IActionResult> AddToFavorite([FromRoute]Guid userId, [FromRoute] Guid houseId)

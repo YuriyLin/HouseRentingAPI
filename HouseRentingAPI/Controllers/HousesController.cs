@@ -60,6 +60,8 @@ namespace HouseRentingAPI.Controllers
                 .Include(h => h.HouseFacilities)
                 .Include(h => h.HouseOtherAttributes)
                 .Include(h => h.Comments)
+                .Include(h => h.HousePhotos)
+                    .ThenInclude(hp => hp.Photo)
                 .FirstOrDefaultAsync(h => h.HouseID == id);
 
             if (house == null)
@@ -73,16 +75,19 @@ namespace HouseRentingAPI.Controllers
                 Address = house.Address,
                 Description = house.Description,
                 Price = house.Price,
+                Squarefeet=house.SquareFeet,
                 Landlordname = house.Landlord.Landlordname,
                 lineID = house.Landlord.LineID,
                 PropertyTypeName = house.PropertyType.TypeName,
                 FacilityIDs = house.HouseFacilities.Select(f => f.FacilityID).ToList(),
                 AttributeIDs = house.HouseOtherAttributes.Select(a => a.AttributeID).ToList(),
-                Comments = house.Comments.Select(c => c.CommentText).ToList()
+                Comments = house.Comments.Select(c => c.CommentText).ToList(),
+                PhotoUrl = house.HousePhotos.Select(hp => hp.Photo.PhotoURL).ToList()
             };
 
             return Ok(gethouse);
         }
+
 
         // House Searching
         // Get:api/Houses/Search/{keyword}  
@@ -265,9 +270,32 @@ namespace HouseRentingAPI.Controllers
             }
         }
 
+        // GET: api/Houses/{houseId}/comments
+        [AllowAnonymous]
+        [HttpGet("{houseId}/comments")]
+        public async Task<ActionResult<List<AllCommentDto>>> GetCommentsByHouseId(Guid houseId)
+        {
+            var house = await _context.Houses
+                .Include(h => h.Comments)
+                .ThenInclude(c => c.User)
+                .FirstOrDefaultAsync(h => h.HouseID == houseId);
+
+            if (house == null)
+            {
+                return NotFound();
+            }
+            var comments = house.Comments.Select(c => new AllCommentDto
+            {
+                Name = c.User.Name, 
+                CommentText = c.CommentText
+            }).ToList();
+
+            return Ok(comments);
+        }
+
         // PUT: api/Houses/comments/{commentId}
         [AllowAnonymous]
-        [HttpPut("/comments/{commentId}")]
+        [HttpPut("comments/{commentId}")]
         public async Task<IActionResult> UpdateComment(Guid commentId, [FromBody] CommentUpdateDto commentUpdateDto)
         {
             try
@@ -291,7 +319,7 @@ namespace HouseRentingAPI.Controllers
 
         // DELETE: api/Houses/comments/{commentId}
         [AllowAnonymous]
-        [HttpDelete("{houseId}/comments/{commentId}")]
+        [HttpDelete("comments/{commentId}")]
         public async Task<IActionResult> DeleteComment(Guid commentId)
         {
             try

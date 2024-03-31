@@ -7,6 +7,7 @@ namespace HouseRentingAPI.Interface
     public interface IHouseService:IGenericRepository<House>
     {
         Task<List<GetHouseDto>> GetAllHouses();
+        //Task<List<GetHouseByIdDto>> GetHousesByLandlord(Guid landlordId);
         Task<List<GetHouseDto>> SearchHouses(string? keyword, int propertyTypeID, List<int> facilityIDs, List<int> attributeIDs, int minPrice, int maxPrice);
         Task SaveHousePhotoAsync(Guid houseId, IFormFile photoFile, bool isCoverPhoto);
         Task<CommentDto> AddCommentAsync(Guid houseId, string content, Guid userId);

@@ -11,6 +11,7 @@ using HouseRentingAPI.Interface;
 using HouseRentingAPI.Model;
 using System.Text;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HouseRentingAPI.Controllers
 {
@@ -51,6 +52,49 @@ namespace HouseRentingAPI.Controllers
             }
 
             return Ok(landlord);
+        }
+
+        // GET: api/Landlords/GetHouse/{LandlordId}
+        [AllowAnonymous]
+        [HttpGet("GetHouse/{landlordId}")]
+        public async Task<ActionResult<GetHouseByIdDto>> GetHouseByLandlordId(Guid landlordId)
+        {
+            var Landlord = await _context.Landlords
+             .Include(l => l.Houses)
+                 .ThenInclude(h => h.PropertyType)
+             .Include(l => l.Houses)
+                 .ThenInclude(h => h.HouseFacilities)
+             .Include(l => l.Houses)
+                 .ThenInclude(h => h.HouseOtherAttributes)
+             .Include(l => l.Houses)
+                 .ThenInclude(h => h.Comments)
+             .Include(l => l.Houses)
+                 .ThenInclude(h => h.HousePhotos)
+                     .ThenInclude(hp => hp.Photo)
+             .FirstOrDefaultAsync(l => l.LandlordID == landlordId);
+
+            if (Landlord == null)
+            {
+                return NotFound();
+            }
+
+            var houses = Landlord.Houses.Select(h => new GetHouseByIdDto
+            {
+                Housename = h.HouseName,
+                Address = h.Address,
+                Description = h.Description,
+                Price = h.Price,
+                Squarefeet = h.SquareFeet,
+                Landlordname = Landlord.Landlordname,
+                lineID = Landlord.LineID,
+                PropertyTypeName = h.PropertyType.TypeName,
+                FacilityIDs = h.HouseFacilities.Select(f => f.FacilityID).ToList(),
+                AttributeIDs = h.HouseOtherAttributes.Select(a => a.AttributeID).ToList(),
+                Comments = h.Comments.Select(c => c.CommentText).ToList(),
+                PhotoUrl = h.HousePhotos.Select(hp => hp.Photo.PhotoURL).ToList()
+            }).ToList();
+
+            return Ok(houses);
         }
 
         // Update Landlord Data
