@@ -92,14 +92,16 @@ namespace HouseRentingAPI.Controllers
         // House Searching
         // Get:api/Houses/Search/{keyword}  
         [AllowAnonymous]
-        [HttpGet("Search")]
-        public async Task<ActionResult<IEnumerable<GetHouseDto>>> SearchHouses(
-            [FromQuery] string? keyword,
-            [FromQuery] int propertyTypeID = 0,
-            [FromQuery] string? facilityIDs = null,
-            [FromQuery] string? attributeIDs = null,
-            [FromQuery] int minPrice = 0,
-            [FromQuery] int maxPrice = 0)
+        [HttpGet("SearchAndSort")]
+        public async Task<ActionResult<IEnumerable<GetHouseDto>>> SearchHousesAndSort(
+        [FromQuery] string? keyword,
+        [FromQuery] int propertyTypeID = 0,
+        [FromQuery] string? facilityIDs = null,
+        [FromQuery] string? attributeIDs = null,
+        [FromQuery] int minPrice = 0,
+        [FromQuery] int maxPrice = 0,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] bool isDescending = false)
         {
             try
             {
@@ -107,7 +109,25 @@ namespace HouseRentingAPI.Controllers
                 List<int>? facilityIDsList = facilityIDs?.Split(',').Select(int.Parse).ToList();
                 List<int>? attributeIDsList = attributeIDs?.Split(',').Select(int.Parse).ToList();
 
+                // 进行房屋搜索
                 var result = await _houseService.SearchHouses(keyword, propertyTypeID, facilityIDsList, attributeIDsList, minPrice, maxPrice);
+
+                // 如果指定了排序参数，则进行排序
+                if (!string.IsNullOrWhiteSpace(sortBy))
+                {
+                    switch (sortBy.ToLower())
+                    {
+                        case "price":
+                            result = isDescending ? result.OrderByDescending(h => h.Price).ToList() : result.OrderBy(h => h.Price).ToList();
+                            break;
+                        //case "distance":
+                        //    result = isDescending ? result.OrderByDescending(h => h.distance).ToList() : result.OrderBy(h => h.distance).ToList();
+                        //    break;
+                        default:
+                            break;
+                    }
+                }
+
                 return Ok(result);
             }
             catch (Exception ex)
@@ -115,6 +135,8 @@ namespace HouseRentingAPI.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+
 
         // POST: api/Houses
         [AllowAnonymous]

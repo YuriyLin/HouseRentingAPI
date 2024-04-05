@@ -6,7 +6,6 @@ namespace HouseRentingAPI.Model
     {
         public Guid UserId { get; set; }
         public Guid HouseId { get; set; }
-        public string Name {  get; set; }
         public string CommentText { get; set; }
         public string? CreatedAt { get; set; }
     }
