@@ -82,7 +82,8 @@ namespace HouseRentingAPI.Controllers
                 FacilityIDs = house.HouseFacilities.Select(f => f.FacilityID).ToList(),
                 AttributeIDs = house.HouseOtherAttributes.Select(a => a.AttributeID).ToList(),
                 Comments = house.Comments.Select(c => c.CommentText).ToList(),
-                PhotoUrl = house.HousePhotos.Select(hp => hp.Photo.PhotoURL).ToList()
+                PhotoUrl = house.HousePhotos.Select(hp => hp.Photo.PhotoURL).ToList(),
+                CommentIDs = house.Comments.Select(c => c.CommentId.ToString()).ToList()
             };
 
             return Ok(gethouse);

@@ -24,9 +24,17 @@ namespace HouseRentingAPI.Service
                 .Where(f => f.UserID == userId)
                 .Select(f => new FavoriteDto
                 {
+                    HouseID = f.House.HouseID,
                     Housename = f.House.HouseName,
                     Address = f.House.Address,
+                    PropertyTypeName = f.House.PropertyType.TypeName, 
+                    SquareFeet = f.House.SquareFeet, 
                     Price = f.House.Price,
+                    CoverPhotoUrl = f.House.HousePhotos.FirstOrDefault(p => p.IsCoverPhoto).Photo.PhotoURL, 
+                    FacilityIDs = f.House.HouseFacilities.Select(hf => hf.FacilityID).ToList(),
+                    AttributeIDs = f.House.HouseOtherAttributes.Select(hoa => hoa.OtherAttribute.AttributeID).ToList(),
+                    UserId = f.UserID,
+                    LandlordId = f.House.LandlordID 
                 })
                 .ToListAsync();
 
@@ -39,9 +47,17 @@ namespace HouseRentingAPI.Service
                 .Where(f => f.HouseID == houseId)
                 .Select(f => new FavoriteDto
                 {
+                    HouseID = f.House.HouseID, 
                     Housename = f.House.HouseName,
                     Address = f.House.Address,
+                    PropertyTypeName = f.House.PropertyType.TypeName,
+                    SquareFeet = f.House.SquareFeet, 
                     Price = f.House.Price,
+                    CoverPhotoUrl = f.House.HousePhotos.FirstOrDefault(p => p.IsCoverPhoto).Photo.PhotoURL, 
+                    FacilityIDs = f.House.HouseFacilities.Select(hf => hf.FacilityID).ToList(),
+                    AttributeIDs = f.House.HouseOtherAttributes.Select(hoa => hoa.OtherAttribute.AttributeID).ToList(),
+                    UserId = f.UserID,
+                    LandlordId = f.House.LandlordID 
                 })
                 .ToListAsync();
 

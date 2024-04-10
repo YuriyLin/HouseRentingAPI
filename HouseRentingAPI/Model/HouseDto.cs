@@ -67,6 +67,8 @@ namespace HouseRentingAPI.Model
         public string SquareFeet { get; set; }
         public int Price { get; set; }
         public string CoverPhotoUrl { get; set; }
+        public List<int> FacilityIDs { get; set; }
+        public List<int> AttributeIDs { get; set; }
     }
 
     public class GetHouseByIdDto
@@ -82,6 +84,7 @@ namespace HouseRentingAPI.Model
         public List<int> FacilityIDs { get; set; }
         public List<int> AttributeIDs { get; set; }
         public List<string> Comments { get; set; }
+        public List<string> CommentIDs { get; set; }
         public List<string> PhotoUrl { get; set; }
     }
 }

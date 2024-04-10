@@ -42,7 +42,10 @@ namespace HouseRentingAPI.Service
                     PropertyTypeName = h.PropertyType.TypeName,
                     SquareFeet = h.SquareFeet,
                     Price = h.Price,
-                    CoverPhotoUrl = h.HousePhotos.FirstOrDefault(p => p.IsCoverPhoto).Photo.PhotoURL
+                    CoverPhotoUrl = h.HousePhotos.FirstOrDefault(p => p.IsCoverPhoto).Photo.PhotoURL,
+                    FacilityIDs = h.HouseFacilities.Select(hf => hf.FacilityID).ToList(),
+                    AttributeIDs = h.HouseOtherAttributes.Select(hoa => hoa.OtherAttribute.AttributeID).ToList()
+
                 })
                 .ToListAsync();
 
@@ -118,7 +121,10 @@ namespace HouseRentingAPI.Service
                     Address = h.Address,
                     PropertyTypeName = h.PropertyType.TypeName,
                     SquareFeet = h.SquareFeet,
-                    Price = h.Price
+                    Price = h.Price,
+                    CoverPhotoUrl = h.HousePhotos.FirstOrDefault(p => p.IsCoverPhoto).Photo.PhotoURL,
+                    FacilityIDs = h.HouseFacilities.Select(hf => hf.FacilityID).ToList(),
+                    AttributeIDs = h.HouseOtherAttributes.Select(hoa => hoa.OtherAttribute.AttributeID).ToList()
                 })
                 .ToListAsync();
 
