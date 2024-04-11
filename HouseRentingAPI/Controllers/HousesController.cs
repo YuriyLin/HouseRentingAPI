@@ -12,6 +12,7 @@ using HouseRentingAPI.Interface;
 using HouseRentingAPI.Model;
 using System.ComponentModel.DataAnnotations;
 using HouseRentingAPI.Service;
+using Azure.Storage.Blobs;
 
 namespace HouseRentingAPI.Controllers
 {
@@ -250,11 +251,8 @@ namespace HouseRentingAPI.Controllers
             // 逐一刪除房屋的相關照片
             foreach (var photo in housePhotos)
             {
-                // 刪除照片文件
-                if (!string.IsNullOrEmpty(photo.Photo.PhotoURL) && System.IO.File.Exists(photo.Photo.PhotoURL))
-                {
-                    System.IO.File.Delete(photo.Photo.PhotoURL);
-                }
+                // 刪除 Azure Blob Storage 中的照片
+                await _houseService.DeleteBlobAsync(photo.Photo.PhotoURL);
 
                 // 從數據庫中刪除 HousePhoto 記錄
                 _context.HousesPhoto.Remove(photo);
@@ -267,6 +265,7 @@ namespace HouseRentingAPI.Controllers
 
             return Ok(new { Message = "房屋資料已刪除" });
         }
+
 
         private async Task<bool> HouseExists(Guid id)
         {
@@ -309,6 +308,7 @@ namespace HouseRentingAPI.Controllers
             }
             var comments = house.Comments.Select(c => new AllCommentDto
             {
+                CommentId=c.CommentId,
                 Name = c.User.Name, 
                 CommentText = c.CommentText
             }).ToList();

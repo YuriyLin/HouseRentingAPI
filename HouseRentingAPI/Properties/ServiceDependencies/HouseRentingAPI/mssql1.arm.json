@@ -4,7 +4,7 @@
   "parameters": {
     "resourceGroupName": {
       "type": "string",
-      "defaultValue": "HouseRentingAPI_db",
+      "defaultValue": "HouseRentingAPI_RG",
       "metadata": {
         "_parameterType": "resourceGroup",
         "description": "資源的資源群組名稱。建議您將資源放在相同的資源群組下，以改進追蹤。"

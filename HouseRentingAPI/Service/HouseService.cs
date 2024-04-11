@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Storage.Blobs;
 using HotelListing.API.Constract;
 using HouseRentingAPI.Data;
 using HouseRentingAPI.Interface;
@@ -130,33 +131,37 @@ namespace HouseRentingAPI.Service
 
             return result;
         }
+
         public async Task SaveHousePhotoAsync(Guid houseId, IFormFile photoFile, bool isCoverPhoto)
         {
-            // 指定上传文件的保存路径
-            var uploadDirectory = @"C:\Users\USER\Downloads\HouseRentingAPI\HouseRentingAPI\Housephoto";
+            // 連接到 Azure Blob Storage 帳戶
+            string connectionString = "DefaultEndpointsProtocol=https;AccountName=houserentingdata;AccountKey=n67JkHDiB7tZS7Vrene7FZuWXX0Pz7iKLaH9EIcfc13Y9FCtQMH2P0Ul3PZt+/zThdm2DZ9l4DXv+AStDH7qnw==;EndpointSuffix=core.windows.net";
+            BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
 
-            // 创建上传目录
-            if (!Directory.Exists(uploadDirectory))
+            // 獲取或創建指定的容器
+            string containerName = "housephoto";
+            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+            await containerClient.CreateIfNotExistsAsync();
+
+            // 生成 Blob 名稱
+            string blobName = $"{Guid.NewGuid().ToString()}{Path.GetExtension(photoFile.FileName)}";
+
+            // 上傳照片到 Blob Storage
+            BlobClient blobClient = containerClient.GetBlobClient(blobName);
+            using (var stream = photoFile.OpenReadStream())
             {
-                Directory.CreateDirectory(uploadDirectory);
+                await blobClient.UploadAsync(stream, true);
             }
 
-            // 生成文件名并拼接文件路径
-            var fileName = $"{Guid.NewGuid().ToString()}{Path.GetExtension(photoFile.FileName)}";
-            var filePath = Path.Combine(uploadDirectory, fileName);
+            // 獲取 Blob 的 URL
+            string blobUrl = blobClient.Uri.ToString();
 
-            // 将文件保存到指定路径
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await photoFile.CopyToAsync(stream);
-            }
-
-            // 將照片路徑保存到數據庫中的Photo表
-            var photo = new Photo { PhotoURL = filePath };
+            // 將 Blob URL 保存到數據庫中的 Photo 表
+            var photo = new Photo { PhotoURL = blobUrl };
             _context.Photo.Add(photo);
             await _context.SaveChangesAsync();
 
-            // 將房屋照片訊息保存到數據庫中的HousePhoto表
+            // 將房屋照片訊息保存到數據庫中的 HousePhoto 表
             var housePhoto = new HousePhoto
             {
                 HouseID = houseId,
@@ -167,6 +172,16 @@ namespace HouseRentingAPI.Service
             await _context.SaveChangesAsync();
         }
 
+        public async Task DeleteBlobAsync(string blobUrl)
+        {
+            // 解析 Blob URL，獲取 Blob 名稱或 Blob Client
+            BlobServiceClient blobServiceClient = new BlobServiceClient("DefaultEndpointsProtocol=https;AccountName=houserentingdata;AccountKey=n67JkHDiB7tZS7Vrene7FZuWXX0Pz7iKLaH9EIcfc13Y9FCtQMH2P0Ul3PZt+/zThdm2DZ9l4DXv+AStDH7qnw==;EndpointSuffix=core.windows.net");
+            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("housephoto");
+            BlobClient blobClient = containerClient.GetBlobClient(blobUrl);
+
+            // 使用 Blob Client 刪除 Blob
+            await blobClient.DeleteIfExistsAsync();
+        }
 
         public async Task<CommentDto> AddCommentAsync(Guid houseId, string content, Guid userId)
         {
