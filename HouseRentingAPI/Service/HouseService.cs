@@ -120,6 +120,26 @@ namespace HouseRentingAPI.Service
             return houseDtos;
         }
 
+        /*public async Task<List<GetHouseByIdDto>> GetHousesByLandlord(Guid landlordId)
+        {
+            var houses = await _context.Houses
+                .Include(h => h.PropertyType)
+                .Include(h => h.HousePhotos)
+                    .ThenInclude(hp => hp.Photo)
+                .Where(h => h.LandlordID == landlordId)
+                .Select(h => new GetHouseByIdDto
+                {
+                    Housename = h.HouseName,
+                    Address = h.Address,
+                    PropertyTypeName = h.PropertyType.TypeName,
+                    Squarefeet = h.SquareFeet,
+                    Price = h.Price,
+                    PhotoUrl = h.HousePhotos.Select(hp => hp.Photo.PhotoURL).ToList()
+                })
+                .ToListAsync();
+
+            return houses;
+        }*/
 
         public async Task<List<GetHouseDto>> SearchHouses(string? keyword, int propertyTypeID, List<int> facilityIDs, List<int> attributeIDs, int minPrice, int maxPrice)
         {
@@ -182,53 +202,12 @@ namespace HouseRentingAPI.Service
 
         public async Task SaveHousePhotoAsync(Guid houseId, IFormFile photoFile, bool isCoverPhoto)
         {
-            // 連接到 Azure Blob Storage 帳戶
-            string connectionString = "YourconnectionString";
-            BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
-
-            // 獲取或創建指定的容器
-            string containerName = "housephoto";
-            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
-            await containerClient.CreateIfNotExistsAsync();
-
-            // 生成 Blob 名稱
-            string blobName = $"{Guid.NewGuid().ToString()}{Path.GetExtension(photoFile.FileName)}";
-
-            // 上傳照片到 Blob Storage
-            BlobClient blobClient = containerClient.GetBlobClient(blobName);
-            using (var stream = photoFile.OpenReadStream())
-            {
-                await blobClient.UploadAsync(stream, true);
-            }
-
-            // 獲取 Blob 的 URL
-            string blobUrl = blobClient.Uri.ToString();
-
-            // 將 Blob URL 保存到數據庫中的 Photo 表
-            var photo = new Photo { PhotoURL = blobUrl };
-            _context.Photo.Add(photo);
-            await _context.SaveChangesAsync();
-
-            // 將房屋照片訊息保存到數據庫中的 HousePhoto 表
-            var housePhoto = new HousePhoto
-            {
-                HouseID = houseId,
-                PhotoID = photo.PhotoID,
-                IsCoverPhoto = isCoverPhoto
-            };
-            _context.HousesPhoto.Add(housePhoto);
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteBlobAsync(string blobUrl)
         {
-            // 解析 Blob URL，獲取 Blob 名稱或 Blob Client
-            BlobServiceClient blobServiceClient = new BlobServiceClient("YourconnectionString");
-            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("housephoto");
-            BlobClient blobClient = containerClient.GetBlobClient(blobUrl);
-
-            // 使用 Blob Client 刪除 Blob
-            await blobClient.DeleteIfExistsAsync();
+            await _context.SaveChangesAsync();
         }
 
         public async Task<CommentDto> AddCommentAsync(Guid houseId, string content, Guid userId, string emotionresult)
