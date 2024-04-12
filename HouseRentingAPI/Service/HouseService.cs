@@ -203,7 +203,7 @@ namespace HouseRentingAPI.Service
         public async Task SaveHousePhotoAsync(Guid houseId, IFormFile photoFile, bool isCoverPhoto)
         {
             // 連接到 Azure Blob Storage 帳戶
-            string connectionString = "DefaultEndpointsProtocol=https;AccountName=houserentingdata;AccountKey=n67JkHDiB7tZS7Vrene7FZuWXX0Pz7iKLaH9EIcfc13Y9FCtQMH2P0Ul3PZt+/zThdm2DZ9l4DXv+AStDH7qnw==;EndpointSuffix=core.windows.net";
+            //string connectionString = "DefaultEndpointsProtocol=https;AccountName=houserentingdata;AccountKey=n67JkHDiB7tZS7Vrene7FZuWXX0Pz7iKLaH9EIcfc13Y9FCtQMH2P0Ul3PZt+/zThdm2DZ9l4DXv+AStDH7qnw==;EndpointSuffix=core.windows.net";
             BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
 
             // 獲取或創建指定的容器
@@ -243,7 +243,7 @@ namespace HouseRentingAPI.Service
         public async Task DeleteBlobAsync(string blobUrl)
         {
             // 解析 Blob URL，獲取 Blob 名稱或 Blob Client
-            BlobServiceClient blobServiceClient = new BlobServiceClient("DefaultEndpointsProtocol=https;AccountName=houserentingdata;AccountKey=n67JkHDiB7tZS7Vrene7FZuWXX0Pz7iKLaH9EIcfc13Y9FCtQMH2P0Ul3PZt+/zThdm2DZ9l4DXv+AStDH7qnw==;EndpointSuffix=core.windows.net");
+            //BlobServiceClient blobServiceClient = new BlobServiceClient("DefaultEndpointsProtocol=https;AccountName=houserentingdata;AccountKey=n67JkHDiB7tZS7Vrene7FZuWXX0Pz7iKLaH9EIcfc13Y9FCtQMH2P0Ul3PZt+/zThdm2DZ9l4DXv+AStDH7qnw==;EndpointSuffix=core.windows.net");
             BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("housephoto");
             BlobClient blobClient = containerClient.GetBlobClient(blobUrl);
 
