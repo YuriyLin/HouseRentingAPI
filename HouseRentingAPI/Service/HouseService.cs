@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HouseRentingAPI.Service
 {
-    //
     public class HouseService : GenericService<House>, IHouseService
     {
         private readonly HouseRentingDbContext _context;
