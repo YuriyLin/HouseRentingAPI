@@ -55,41 +55,29 @@ namespace HouseRentingAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<GetHouseByIdDto>> GetHouseById(Guid id)
         {
-            var house = await _context.Houses
-                .Include(h => h.Landlord)
-                .Include(h => h.PropertyType)
-                .Include(h => h.HouseFacilities)
-                .Include(h => h.HouseOtherAttributes)
-                .Include(h => h.Comments)
-                .Include(h => h.HousePhotos)
-                    .ThenInclude(hp => hp.Photo)
-                .FirstOrDefaultAsync(h => h.HouseID == id);
+            var house = await _houseService.GetHouseById(id);
 
             if (house == null)
             {
                 return NotFound();
             }
 
-            var gethouse = new GetHouseByIdDto
-            {
-                Housename = house.HouseName,
-                Address = house.Address,
-                Description = house.Description,
-                Price = house.Price,
-                Squarefeet=house.SquareFeet,
-                Landlordname = house.Landlord.Landlordname,
-                lineID = house.Landlord.LineID,
-                PropertyTypeName = house.PropertyType.TypeName,
-                FacilityIDs = house.HouseFacilities.Select(f => f.FacilityID).ToList(),
-                AttributeIDs = house.HouseOtherAttributes.Select(a => a.AttributeID).ToList(),
-                Comments = house.Comments.Select(c => c.CommentText).ToList(),
-                PhotoUrl = house.HousePhotos.Select(hp => hp.Photo.PhotoURL).ToList(),
-                CommentIDs = house.Comments.Select(c => c.CommentId.ToString()).ToList()
-            };
-
-            return Ok(gethouse);
+            return Ok(house);
         }
 
+        // GET: api/Houses/compare
+        [AllowAnonymous]
+        [HttpGet("compare")]
+        public async Task<IActionResult> CompareHouses([FromQuery] List<Guid> houseIds)
+        {
+            if (houseIds.Count != 2)
+            {
+                return BadRequest("Please provide exactly two house IDs.");
+            }
+
+            var houses = await _houseService.GetHousesByIds(houseIds);
+            return Ok(houses);
+        }
 
         // House Searching
         // Get:api/Houses/Search/{keyword}  
@@ -283,7 +271,8 @@ namespace HouseRentingAPI.Controllers
                 Guid houseId = commentDto.HouseId;
                 string content = commentDto.CommentText;
                 Guid userId = commentDto.UserId;
-                await _houseService.AddCommentAsync(houseId, content, userId);
+                string emotionresult = commentDto.emotionresult;
+                await _houseService.AddCommentAsync(houseId, content, userId, emotionresult);
                 return Ok(new { Message = "Comment added successfully." });
             }
             catch (Exception ex)
@@ -310,7 +299,8 @@ namespace HouseRentingAPI.Controllers
             {
                 CommentId=c.CommentId,
                 Name = c.User.Name, 
-                CommentText = c.CommentText
+                CommentText = c.CommentText,
+                emotionresult=c.emotionresult
             }).ToList();
 
             return Ok(comments);

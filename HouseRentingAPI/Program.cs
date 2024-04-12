@@ -40,19 +40,19 @@ builder.Services.AddAuthorization(options =>
     });
 });
 
-builder.Services.AddAutoMapper(typeof(MapperConfig));
-builder.Services.AddScoped<UsersController>();
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericService<>));
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<LandlordsController>();
-builder.Services.AddScoped<ILandlordService, LandLordService>();
-builder.Services.AddScoped<HousesController>();
-builder.Services.AddScoped<IHouseService, HouseService>();
-builder.Services.AddScoped<FavoritesController>();
-builder.Services.AddScoped<IFavoriteService, FavoriteService>();
-builder.Services.AddScoped<ICommentService, CommentService>();
-builder.Services.AddScoped<IHouseFacilityService, HouseFacilityService>();
-builder.Services.AddScoped<IHouseAttributeService, HouseAttributeService>();
+    builder.Services.AddAutoMapper(typeof(MapperConfig));
+    builder.Services.AddScoped<UsersController>();
+    builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericService<>));
+    builder.Services.AddScoped<IUserService, UserService>();
+    builder.Services.AddScoped<LandlordsController>();
+    builder.Services.AddScoped<ILandlordService, LandLordService>();
+    builder.Services.AddScoped<HousesController>();
+    builder.Services.AddScoped<IHouseService, HouseService>();
+    builder.Services.AddScoped<FavoritesController>();
+    builder.Services.AddScoped<IFavoriteService, FavoriteService>();
+    builder.Services.AddScoped<ICommentService, CommentService>();
+    builder.Services.AddScoped<IHouseFacilityService, HouseFacilityService>();
+    builder.Services.AddScoped<IHouseAttributeService, HouseAttributeService>();
 
 var app = builder.Build();
 
