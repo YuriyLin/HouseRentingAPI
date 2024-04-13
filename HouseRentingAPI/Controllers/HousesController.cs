@@ -70,13 +70,25 @@ namespace HouseRentingAPI.Controllers
         [HttpGet("compare")]
         public async Task<IActionResult> CompareHouses([FromQuery] List<Guid> houseIds)
         {
-            if (houseIds.Count != 2)
+            if (houseIds == null || houseIds.Count != 2)
             {
                 return BadRequest("Please provide exactly two house IDs.");
             }
 
-            var houses = await _houseService.GetHousesByIds(houseIds);
-            return Ok(houses);
+            try
+            {
+                var houses = await _houseService.GetHousesByIds(houseIds);
+                if (houses == null || houses.Count == 0)
+                {
+                    return NotFound("One or both of the specified houses could not be found.");
+                }
+
+                return Ok(houses);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
         }
 
         // House Searching
