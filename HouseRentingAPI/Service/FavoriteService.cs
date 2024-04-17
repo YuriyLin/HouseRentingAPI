@@ -1,6 +1,7 @@
 ﻿using HouseRentingAPI.Data;
 using HouseRentingAPI.Interface;
 using HouseRentingAPI.Model;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HouseRentingAPI.Service
@@ -41,23 +42,13 @@ namespace HouseRentingAPI.Service
             return favorites;
         }
 
-        public async Task<List<FavoriteDto>> GetHouseFavoritesAsync(Guid houseId)
+        public async Task<List<FavoitebyUserIdDto>> GetUserFavoritesHouse(Guid userId)
         {
             var favorites = await _context.Favorites
-                .Where(f => f.HouseID == houseId)
-                .Select(f => new FavoriteDto
+                .Where(f => f.UserID == userId)
+                .Select(f => new FavoitebyUserIdDto
                 {
-                    HouseID = f.House.HouseID, 
-                    Housename = f.House.HouseName,
-                    Address = f.House.Address,
-                    PropertyTypeName = f.House.PropertyType.TypeName,
-                    SquareFeet = f.House.SquareFeet, 
-                    Price = f.House.Price,
-                    CoverPhotoUrl = f.House.HousePhotos.FirstOrDefault(p => p.IsCoverPhoto).Photo.PhotoURL, 
-                    FacilityIDs = f.House.HouseFacilities.Select(hf => hf.FacilityID).ToList(),
-                    AttributeIDs = f.House.HouseOtherAttributes.Select(hoa => hoa.OtherAttribute.AttributeID).ToList(),
-                    UserId = f.UserID,
-                    LandlordId = f.House.LandlordID 
+                    HouseId = f.House.HouseID, 
                 })
                 .ToListAsync();
 

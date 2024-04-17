@@ -52,7 +52,7 @@ namespace HouseRentingAPI.Service
             }
 
 
-
+            /*
             if (userRegisterDto.StudentIdCard != null && userRegisterDto.StudentIdCard.Length > 0)
             {
                 // 指定上传文件的保存路径
@@ -83,6 +83,7 @@ namespace HouseRentingAPI.Service
                 _context.User.Add(user);
                 await _context.SaveChangesAsync();  
             }
+            */
         }
         public async Task<String> UpdateUserPasswordAsync(Guid userId, UpdateUserPasswordDto updateuserPasswordDto)
         {

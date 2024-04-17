@@ -8,4 +8,9 @@ namespace HouseRentingAPI.Model
         public Guid UserId { get; set; }
         public Guid LandlordId { get; set; }
     }
+
+    public class FavoitebyUserIdDto
+    {
+        public Guid HouseId { get; set; }
+    }
 }

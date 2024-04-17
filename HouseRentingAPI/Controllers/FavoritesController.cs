@@ -10,6 +10,7 @@ using HouseRentingAPI.Model;
 using AutoMapper;
 using HouseRentingAPI.Constract;
 using HouseRentingAPI.Interface;
+using System.Runtime.InteropServices;
 
 namespace HouseRentingAPI.Controllers
 {
@@ -40,15 +41,11 @@ namespace HouseRentingAPI.Controllers
             return Ok(favorites);
         }
 
-        // GET: api/Favorites/{houseId}
-        [HttpGet("house/{houseId}")]
-        public async Task<ActionResult<IEnumerable<FavoriteDto>>> GetHouseFavorites([FromRoute]Guid houseId)
+        // GET: api/Favorites/{userId}
+        [HttpGet("User/{userId}")]
+        public async Task<ActionResult<IEnumerable<FavoitebyUserIdDto>>> UserFavoritesHouse(Guid userId)
         {
-            var favorites = await _favoriteService.GetHouseFavoritesAsync(houseId);
-            if (favorites == null)
-            {
-                return NotFound();
-            }
+            var favorites = await _favoriteService.GetUserFavoritesHouse(userId);
             return Ok(favorites);
         }
 

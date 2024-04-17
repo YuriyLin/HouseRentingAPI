@@ -15,8 +15,7 @@ namespace HouseRentingAPI.Model
         public string? Email { get; set; }
         [Required]
         public string Password { get; set; }
-        [Required]
-        public IFormFile StudentIdCard { get; set; }
+        public IFormFile? StudentIdCard { get; set; }
         public string? StudentIdCardPath { get; set; }
     }
 
