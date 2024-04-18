@@ -86,5 +86,7 @@ namespace HouseRentingAPI.Model
         public List<string> Comments { get; set; }
         public List<string> CommentIDs { get; set; }
         public List<string> PhotoUrl { get; set; }
+        public int? CommentCount { get; set; }
+        public int? FavoriteCount { get; set; }
     }
 }

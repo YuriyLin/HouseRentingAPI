@@ -56,6 +56,9 @@ namespace HouseRentingAPI.Service
                     .ThenInclude(hp => hp.Photo)
                 .FirstOrDefaultAsync(h => h.HouseID == id);
 
+            int commentCount = _context.Comment.Count(c => c.CommentId == id);
+            int favoriteCount = _context.Favorites.Count(f => f.HouseID == id);
+
             var gethouse = new GetHouseByIdDto
             {
                 Housename = house.HouseName,
@@ -70,7 +73,9 @@ namespace HouseRentingAPI.Service
                 AttributeIDs = house.HouseOtherAttributes.Select(a => a.AttributeID).ToList(),
                 Comments = house.Comments.Select(c => c.CommentText).ToList(),
                 PhotoUrl = house.HousePhotos.Select(hp => hp.Photo.PhotoURL).ToList(),
-                CommentIDs = house.Comments.Select(c => c.CommentId.ToString()).ToList()
+                CommentIDs = house.Comments.Select(c => c.CommentId.ToString()).ToList(),
+                CommentCount = commentCount,
+                FavoriteCount = favoriteCount
             };
 
             return gethouse;
