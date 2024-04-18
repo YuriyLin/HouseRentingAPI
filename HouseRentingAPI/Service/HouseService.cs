@@ -57,8 +57,15 @@ namespace HouseRentingAPI.Service
                     .ThenInclude(hp => hp.Photo)
                 .FirstOrDefaultAsync(h => h.HouseID == id);
 
-            int commentCount = _context.Comment.Count(c => c.CommentId == id);
-            int favoriteCount = _context.Favorites.Count(f => f.HouseID == id);
+            int commentCount = await _context.Comment
+                .Where(c => c.HouseId == id)
+                .Select(c => c.CommentId)
+                .CountAsync();
+
+            int favoriteCount = await _context.Favorites
+                                      .Where(f => f.HouseID == id)
+                                      .Select(f => f.UserID)
+                                      .CountAsync();
 
             var gethouse = new GetHouseByIdDto
             {
