@@ -41,6 +41,7 @@ namespace HouseRentingAPI.Model
 
     public class UpdateUserDto
     {
+        public int ? AvatarNum { get; set; }
         public string? Name { get; set; }
         public string? PhoneNum { get; set; }
         public string? StuId { get; set; }
