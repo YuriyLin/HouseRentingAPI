@@ -50,9 +50,15 @@ namespace HouseRentingAPI.Service
                 // 保存加密後的密碼到用戶對象中
                 userRegisterDto.Password = hash;
             }
+            userRegisterDto.StudentIdCardPath = "";
 
+            // 将用户信息保存到数据库
+            var user = _mapper.Map<User>(userRegisterDto);
+            _context.User.Add(user);
+            await _context.SaveChangesAsync();
+        }
 
-            /*
+        /*
             if (userRegisterDto.StudentIdCard != null && userRegisterDto.StudentIdCard.Length > 0)
             {
                 // 指定上传文件的保存路径
@@ -84,7 +90,7 @@ namespace HouseRentingAPI.Service
                 await _context.SaveChangesAsync();  
             }
             */
-        }
+
         public async Task<String> UpdateUserPasswordAsync(Guid userId, UpdateUserPasswordDto updateuserPasswordDto)
         {
             // 檢查舊密碼是否正確
