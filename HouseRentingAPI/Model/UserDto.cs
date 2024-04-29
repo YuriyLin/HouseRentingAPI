@@ -38,6 +38,7 @@ namespace HouseRentingAPI.Model
         public string PhoneNum { get; set; }
         public string StuId { get; set; }
         public string Email { get; set; }
+        public int? AvatarNum { get; set; }
     }
 
     public class UpdateUserDto

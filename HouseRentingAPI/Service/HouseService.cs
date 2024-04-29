@@ -37,8 +37,9 @@ namespace HouseRentingAPI.Service
                     Price = h.Price,
                     CoverPhotoUrl = h.HousePhotos.FirstOrDefault(p => p.IsCoverPhoto).Photo.PhotoURL,
                     FacilityIDs = h.HouseFacilities.Select(hf => hf.FacilityID).ToList(),
-                    AttributeIDs = h.HouseOtherAttributes.Select(hoa => hoa.OtherAttribute.AttributeID).ToList()
-
+                    AttributeIDs = h.HouseOtherAttributes.Select(hoa => hoa.OtherAttribute.AttributeID).ToList(),
+                    FavoriteCount = h.Favorites.Count,
+                    CommentCount = h.Comments.Count
                 })
                 .ToListAsync();
 
@@ -185,6 +186,7 @@ namespace HouseRentingAPI.Service
                 query = query.Where(h => h.Price <= maxPrice);
             }
 
+
             var result = await query
                 .Select(h => new GetHouseDto
                 {
@@ -196,7 +198,9 @@ namespace HouseRentingAPI.Service
                     Price = h.Price,
                     CoverPhotoUrl = h.HousePhotos.FirstOrDefault(p => p.IsCoverPhoto).Photo.PhotoURL,
                     FacilityIDs = h.HouseFacilities.Select(hf => hf.FacilityID).ToList(),
-                    AttributeIDs = h.HouseOtherAttributes.Select(hoa => hoa.OtherAttribute.AttributeID).ToList()
+                    AttributeIDs = h.HouseOtherAttributes.Select(hoa => hoa.OtherAttribute.AttributeID).ToList(),
+                    FavoriteCount = h.Favorites.Count,
+                    CommentCount = h.Comments.Count
                 })
                 .ToListAsync();
 

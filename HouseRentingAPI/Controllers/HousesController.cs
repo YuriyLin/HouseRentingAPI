@@ -122,9 +122,12 @@ namespace HouseRentingAPI.Controllers
                         case "price":
                             result = isDescending ? result.OrderByDescending(h => h.Price).ToList() : result.OrderBy(h => h.Price).ToList();
                             break;
-                        //case "distance":
-                        //    result = isDescending ? result.OrderByDescending(h => h.distance).ToList() : result.OrderBy(h => h.distance).ToList();
-                        //    break;
+                        case "favoritecount":
+                            result = isDescending ? result.OrderByDescending(h => h.FavoriteCount).ToList() : result.OrderBy(h => h.FavoriteCount).ToList();
+                            break;
+                        case "commentcount":
+                            result = isDescending ? result.OrderByDescending(h => h.CommentCount).ToList() : result.OrderBy(h => h.CommentCount).ToList();
+                            break;
                         default:
                             break;
                     }

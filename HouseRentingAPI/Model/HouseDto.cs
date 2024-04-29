@@ -69,6 +69,8 @@ namespace HouseRentingAPI.Model
         public string CoverPhotoUrl { get; set; }
         public List<int> FacilityIDs { get; set; }
         public List<int> AttributeIDs { get; set; }
+        public int? CommentCount { get; set; }
+        public int? FavoriteCount { get; set; }
     }
 
     public class GetHouseByIdDto
