@@ -46,6 +46,39 @@ namespace HouseRentingAPI.Service
             return houses;
         }
 
+        public async Task<PagedList<GetHouseDto>> GetPagedHouses(int pageNumber, int pageSize)
+        {
+            // 首先建立查詢，包含了要映射到 GetHouseDto 的資料
+            var query = _context.Houses
+                .Include(h => h.HousePhotos) // 包含房子的照片資料
+                .Select(h => new GetHouseDto
+                {
+                    HouseID = h.HouseID,
+                    Housename = h.HouseName,
+                    Address = h.Address,
+                    PropertyTypeName = h.PropertyType.TypeName,
+                    SquareFeet = h.SquareFeet,
+                    Price = h.Price,
+                    CoverPhotoUrl = h.HousePhotos.FirstOrDefault(p => p.IsCoverPhoto).Photo.PhotoURL,
+                    FacilityIDs = h.HouseFacilities.Select(hf => hf.FacilityID).ToList(),
+                    AttributeIDs = h.HouseOtherAttributes.Select(hoa => hoa.OtherAttribute.AttributeID).ToList(),
+                    FavoriteCount = h.Favorites.Count,
+                    CommentCount = h.Comments.Count
+                });
+
+            // 計算總記錄數，以便計算總頁數
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            // 使用 Skip 和 Take 方法來應用分頁
+            var pagedHouses = await query.Skip((pageNumber - 1) * pageSize)
+                                          .Take(pageSize)
+                                          .ToListAsync();
+
+            // 將分頁後的結果和相關資訊打包成 PagedList<GetHouseDto> 返回
+            return new PagedList<GetHouseDto>(pagedHouses, totalCount, pageNumber, pageSize, totalPages);
+        }
+
         public async Task<GetHouseByIdDto> GetHouseById(Guid id)
         {
             var house = await _context.Houses
@@ -119,6 +152,8 @@ namespace HouseRentingAPI.Service
                 CoverPhotoUrl = house.HousePhotos.FirstOrDefault(p => p.IsCoverPhoto).Photo.PhotoURL,
                 FacilityIDs = house.HouseFacilities.Select(f => f.FacilityID).ToList(),
                 AttributeIDs = house.HouseOtherAttributes.Select(a => a.AttributeID).ToList(),
+                FavoriteCount = house.Favorites.Count,
+                CommentCount = house.Comments.Count
             }).ToList();
 
             return houseDtos;

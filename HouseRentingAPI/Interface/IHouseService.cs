@@ -8,6 +8,7 @@ namespace HouseRentingAPI.Interface
     public interface IHouseService:IGenericRepository<House>
     {
         Task<List<GetHouseDto>> GetAllHouses();
+        Task<PagedList<GetHouseDto>> GetPagedHouses(int pageNumber, int pageSize);
         Task<GetHouseByIdDto> GetHouseById(Guid id);
         Task<List<GetHouseDto>> GetHousesByIds(List<Guid> houseIds);
         //Task<List<GetHouseByIdDto>> GetHousesByLandlord(Guid landlordId);
