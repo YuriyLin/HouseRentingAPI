@@ -146,14 +146,14 @@ namespace HouseRentingAPI.Service
                 HouseID = house.HouseID,
                 Housename = house.HouseName,
                 Address = house.Address,
-                PropertyTypeName = house.PropertyType.TypeName,
+                PropertyTypeName = house.PropertyType?.TypeName,
                 SquareFeet = house.SquareFeet,
                 Price = house.Price,
                 CoverPhotoUrl = house.HousePhotos.FirstOrDefault(p => p.IsCoverPhoto).Photo.PhotoURL,
                 FacilityIDs = house.HouseFacilities.Select(f => f.FacilityID).ToList(),
                 AttributeIDs = house.HouseOtherAttributes.Select(a => a.AttributeID).ToList(),
-                FavoriteCount = house.Favorites.Count,
-                CommentCount = house.Comments.Count
+                FavoriteCount = house.Favorites?.Count,
+                CommentCount = house.Comments?.Count
             }).ToList();
 
             return houseDtos;

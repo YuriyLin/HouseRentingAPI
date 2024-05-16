@@ -91,6 +91,21 @@ namespace HouseRentingAPI.Controllers
             }
         }
 
+        [AllowAnonymous]
+        [HttpGet("Paged")]
+        public async Task<IActionResult> GetPagedHouses(int pageNumber = 1, int pageSize = 12)
+        {
+            try
+            {
+                var pagedHouses = await _houseService.GetPagedHouses(pageNumber, pageSize);
+                return Ok(pagedHouses);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         // House Searching
         // Get:api/Houses/Search/{keyword}  
         [AllowAnonymous]
@@ -103,7 +118,9 @@ namespace HouseRentingAPI.Controllers
         [FromQuery] int minPrice = 0,
         [FromQuery] int maxPrice = 0,
         [FromQuery] string? sortBy = null,
-        [FromQuery] bool isDescending = false)
+        [FromQuery] bool isDescending = false,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 8)
         {
             try
             {
@@ -132,8 +149,10 @@ namespace HouseRentingAPI.Controllers
                             break;
                     }
                 }
-
                 return Ok(result);
+
+                //var pagedResult = result.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+                //return Ok(pagedResult);
             }
             catch (Exception ex)
             {
@@ -214,6 +233,44 @@ namespace HouseRentingAPI.Controllers
             }
 
             _mapper.Map(updateHouseDto, house);
+
+            // 先刪除該房屋原有的所有 HouseFacility 和 HouseOtherAttribute 記錄
+            var existingHouseFacilities = _context.HouseFacilities.Where(hf => hf.HouseID == id);
+            _context.HouseFacilities.RemoveRange(existingHouseFacilities);
+
+            var existingHouseOtherAttributes = _context.HouseOtherAttributes.Where(hoa => hoa.HouseID == id);
+            _context.HouseOtherAttributes.RemoveRange(existingHouseOtherAttributes);
+
+            // 重新添加 HouseFacility 和 HouseOtherAttribute 記錄
+            foreach (var facilityId in updateHouseDto.FacilityIDs)
+            {
+                var facility = await _houseFacilityService.GetByIdAsync(id, facilityId);
+                if (facility == null)
+                {
+                    house.HouseFacilities.Add(new HouseFacility { HouseID = id, FacilityID = facilityId });
+                }
+            }
+
+            foreach (var attributeId in updateHouseDto.AttributeIDs)
+            {
+                var attribute = await _houseAttributeService.GetByIdAsync(id, attributeId);
+                if (attribute == null)
+                {
+                    house.HouseOtherAttributes.Add(new HouseOtherAttribute { HouseID = id, AttributeID = attributeId });
+                }
+            }
+
+            // 刪除該房屋原有的所有照片記錄
+            var existingHousePhotos = _context.HousesPhoto.Where(hp => hp.HouseID == id);
+            _context.HousesPhoto.RemoveRange(existingHousePhotos);
+
+            // 上傳新的照片
+            bool isFirstPhoto = true;
+            foreach (var photoFile in updateHouseDto.HousePhotos)
+            {
+                await _houseService.SaveHousePhotoAsync(id, photoFile, isFirstPhoto);
+                isFirstPhoto = false;
+            }
 
             try
             {

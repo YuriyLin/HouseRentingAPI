@@ -56,6 +56,7 @@ namespace HouseRentingAPI.Model
         public int? PropertyTypeID { get; set; }
         public List<int> FacilityIDs { get; set; }
         public List<int> AttributeIDs { get; set; }
+        public List<IFormFile> HousePhotos { get; set; }
     }
 
     public class GetHouseDto

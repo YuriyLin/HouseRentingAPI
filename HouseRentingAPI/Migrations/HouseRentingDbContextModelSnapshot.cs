@@ -51,7 +51,7 @@ namespace HouseRentingAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comment");
+                    b.ToTable("Comment", (string)null);
                 });
 
             modelBuilder.Entity("HouseRentingAPI.Data.ComparisonList", b =>
@@ -72,7 +72,7 @@ namespace HouseRentingAPI.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("ComparisonLists");
+                    b.ToTable("ComparisonLists", (string)null);
                 });
 
             modelBuilder.Entity("HouseRentingAPI.Data.Facility", b =>
@@ -89,7 +89,7 @@ namespace HouseRentingAPI.Migrations
 
                     b.HasKey("FacilityID");
 
-                    b.ToTable("Facilities");
+                    b.ToTable("Facilities", (string)null);
                 });
 
             modelBuilder.Entity("HouseRentingAPI.Data.Favorite", b =>
@@ -104,7 +104,7 @@ namespace HouseRentingAPI.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("Favorites");
+                    b.ToTable("Favorites", (string)null);
                 });
 
             modelBuilder.Entity("HouseRentingAPI.Data.House", b =>
@@ -147,7 +147,7 @@ namespace HouseRentingAPI.Migrations
 
                     b.HasIndex("PropertyTypeID");
 
-                    b.ToTable("Houses");
+                    b.ToTable("Houses", (string)null);
                 });
 
             modelBuilder.Entity("HouseRentingAPI.Data.HouseFacility", b =>
@@ -162,7 +162,7 @@ namespace HouseRentingAPI.Migrations
 
                     b.HasIndex("FacilityID");
 
-                    b.ToTable("HouseFacilities");
+                    b.ToTable("HouseFacilities", (string)null);
                 });
 
             modelBuilder.Entity("HouseRentingAPI.Data.HouseOtherAttribute", b =>
@@ -177,7 +177,7 @@ namespace HouseRentingAPI.Migrations
 
                     b.HasIndex("AttributeID");
 
-                    b.ToTable("HouseOtherAttributes");
+                    b.ToTable("HouseOtherAttributes", (string)null);
                 });
 
             modelBuilder.Entity("HouseRentingAPI.Data.HousePhoto", b =>
@@ -195,7 +195,7 @@ namespace HouseRentingAPI.Migrations
 
                     b.HasIndex("PhotoID");
 
-                    b.ToTable("HousesPhoto");
+                    b.ToTable("HousesPhoto", (string)null);
                 });
 
             modelBuilder.Entity("HouseRentingAPI.Data.Landlord", b =>
@@ -221,7 +221,7 @@ namespace HouseRentingAPI.Migrations
 
                     b.HasKey("LandlordID");
 
-                    b.ToTable("Landlords");
+                    b.ToTable("Landlords", (string)null);
                 });
 
             modelBuilder.Entity("HouseRentingAPI.Data.OtherAttribute", b =>
@@ -238,7 +238,7 @@ namespace HouseRentingAPI.Migrations
 
                     b.HasKey("AttributeID");
 
-                    b.ToTable("OtherAttributes");
+                    b.ToTable("OtherAttributes", (string)null);
                 });
 
             modelBuilder.Entity("HouseRentingAPI.Data.Photo", b =>
@@ -253,7 +253,7 @@ namespace HouseRentingAPI.Migrations
 
                     b.HasKey("PhotoID");
 
-                    b.ToTable("Photo");
+                    b.ToTable("Photo", (string)null);
                 });
 
             modelBuilder.Entity("HouseRentingAPI.Data.PropertyType", b =>
@@ -270,7 +270,7 @@ namespace HouseRentingAPI.Migrations
 
                     b.HasKey("PropertyTypeID");
 
-                    b.ToTable("PropertyTypes");
+                    b.ToTable("PropertyTypes", (string)null);
                 });
 
             modelBuilder.Entity("HouseRentingAPI.Data.User", b =>
@@ -307,7 +307,7 @@ namespace HouseRentingAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("HouseRentingAPI.Data.Comment", b =>

@@ -135,7 +135,7 @@ namespace HouseRentingAPI.Controllers
             }
 
             using (var sha256 = SHA256.Create())
-            {
+            { 
                 var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(userLoginDto.Password));
                 var hash = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
 

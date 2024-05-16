@@ -30,7 +30,8 @@ namespace HouseRentingAPI.Data
             modelBuilder.Entity<Favorite>()
                 .HasOne(f => f.User)
                 .WithMany(u => u.Favorites)
-                .HasForeignKey(f => f.UserID);
+                .HasForeignKey(f => f.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // House to Favorite (One-to-Many)
             modelBuilder.Entity<Favorite>()
@@ -42,13 +43,15 @@ namespace HouseRentingAPI.Data
             modelBuilder.Entity<Comment>()
             .HasOne(c => c.User)
             .WithMany(u => u.Comments)
-            .HasForeignKey(c => c.UserId);
+            .HasForeignKey(c => c.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
             // House to Comment (One-to-Many)
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.House)
                 .WithMany(h => h.Comments)
-                .HasForeignKey(c => c.HouseId);
+                .HasForeignKey(c => c.HouseId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // HouseFacility to House (many-to-one)
             modelBuilder.Entity<HouseFacility>()
@@ -84,7 +87,8 @@ namespace HouseRentingAPI.Data
             modelBuilder.Entity<House>()
                 .HasOne(h => h.Landlord)
                 .WithMany(l => l.Houses)
-                .HasForeignKey(h => h.LandlordID);
+                .HasForeignKey(h => h.LandlordID)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // House to HouseOtherAttribute (One-to-Many)
             modelBuilder.Entity<HouseOtherAttribute>()
