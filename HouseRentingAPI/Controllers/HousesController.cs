@@ -70,17 +70,17 @@ namespace HouseRentingAPI.Controllers
         [HttpGet("compare")]
         public async Task<IActionResult> CompareHouses([FromQuery] List<Guid> houseIds)
         {
-            if (houseIds == null || houseIds.Count != 2)
+            if (houseIds == null || (houseIds.Count != 2 && houseIds.Count != 5))
             {
-                return BadRequest("Please provide exactly two house IDs.");
+                return BadRequest("Please provide exactly house IDs.");
             }
 
             try
             {
                 var houses = await _houseService.GetHousesByIds(houseIds);
-                if (houses == null || houses.Count == 0)
+                if (houses == null || houses.Count != houseIds.Count)
                 {
-                    return NotFound("One or both of the specified houses could not be found.");
+                    return NotFound("One or more of the specified houses could not be found.");
                 }
 
                 return Ok(houses);
@@ -150,9 +150,6 @@ namespace HouseRentingAPI.Controllers
                     }
                 }
                 return Ok(result);
-
-                //var pagedResult = result.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-                //return Ok(pagedResult);
             }
             catch (Exception ex)
             {

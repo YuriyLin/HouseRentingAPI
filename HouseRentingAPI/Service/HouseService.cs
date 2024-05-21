@@ -48,8 +48,12 @@ namespace HouseRentingAPI.Service
 
         public async Task<PagedList<GetHouseDto>> GetPagedHouses(int pageNumber, int pageSize)
         {
-            // 首先建立查詢，包含了要映射到 GetHouseDto 的資料
-            var query = _context.Houses
+            // 首先計算總記錄數，以便計算總頁數
+            var totalCount = await _context.Houses.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            // 使用 Skip 和 Take 方法來應用分頁，並直接投影到 DTO
+            var pagedHouses = await _context.Houses
                 .Include(h => h.HousePhotos) // 包含房子的照片資料
                 .Select(h => new GetHouseDto
                 {
@@ -64,16 +68,10 @@ namespace HouseRentingAPI.Service
                     AttributeIDs = h.HouseOtherAttributes.Select(hoa => hoa.OtherAttribute.AttributeID).ToList(),
                     FavoriteCount = h.Favorites.Count,
                     CommentCount = h.Comments.Count
-                });
-
-            // 計算總記錄數，以便計算總頁數
-            var totalCount = await query.CountAsync();
-            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
-
-            // 使用 Skip 和 Take 方法來應用分頁
-            var pagedHouses = await query.Skip((pageNumber - 1) * pageSize)
-                                          .Take(pageSize)
-                                          .ToListAsync();
+                })
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
             // 將分頁後的結果和相關資訊打包成 PagedList<GetHouseDto> 返回
             return new PagedList<GetHouseDto>(pagedHouses, totalCount, pageNumber, pageSize, totalPages);
@@ -89,17 +87,15 @@ namespace HouseRentingAPI.Service
                 .Include(h => h.Comments)
                 .Include(h => h.HousePhotos)
                     .ThenInclude(hp => hp.Photo)
-                .FirstOrDefaultAsync(h => h.HouseID == id);
+                .SingleOrDefaultAsync(h => h.HouseID == id);
 
-            int commentCount = await _context.Comment
+            var commentCount = await _context.Comment
                 .Where(c => c.HouseId == id)
-                .Select(c => c.CommentId)
                 .CountAsync();
 
-            int favoriteCount = await _context.Favorites
-                                      .Where(f => f.HouseID == id)
-                                      .Select(f => f.UserID)
-                                      .CountAsync();
+            var favoriteCount = await _context.Favorites
+                .Where(f => f.HouseID == id)
+                .CountAsync();
 
             var gethouse = new GetHouseByIdDto
             {
@@ -126,65 +122,31 @@ namespace HouseRentingAPI.Service
         public async Task<List<GetHouseDto>> GetHousesByIds(List<Guid> houseIds)
         {
             var houses = await _context.Houses
-                .Include(h => h.Landlord)
-                .Include(h => h.PropertyType)
-                .Include(h => h.HouseFacilities)
-                .Include(h => h.HouseOtherAttributes)
-                .Include(h => h.Comments)
-                .Include(h => h.HousePhotos)
-                    .ThenInclude(hp => hp.Photo)
                 .Where(h => houseIds.Contains(h.HouseID))
-                .ToListAsync();
-
-            if (houses == null || houses.Count == 0)
-            {
-                return null;
-            }
-
-            var houseDtos = houses.Select(house => new GetHouseDto
-            {
-                HouseID = house.HouseID,
-                Housename = house.HouseName,
-                Address = house.Address,
-                PropertyTypeName = house.PropertyType?.TypeName,
-                SquareFeet = house.SquareFeet,
-                Price = house.Price,
-                CoverPhotoUrl = house.HousePhotos.FirstOrDefault(p => p.IsCoverPhoto).Photo.PhotoURL,
-                FacilityIDs = house.HouseFacilities.Select(f => f.FacilityID).ToList(),
-                AttributeIDs = house.HouseOtherAttributes.Select(a => a.AttributeID).ToList(),
-                FavoriteCount = house.Favorites?.Count,
-                CommentCount = house.Comments?.Count
-            }).ToList();
-
-            return houseDtos;
-        }
-
-        /*public async Task<List<GetHouseByIdDto>> GetHousesByLandlord(Guid landlordId)
-        {
-            var houses = await _context.Houses
-                .Include(h => h.PropertyType)
-                .Include(h => h.HousePhotos)
-                    .ThenInclude(hp => hp.Photo)
-                .Where(h => h.LandlordID == landlordId)
-                .Select(h => new GetHouseByIdDto
+                .Select(h => new GetHouseDto
                 {
+                    HouseID = h.HouseID,
                     Housename = h.HouseName,
                     Address = h.Address,
                     PropertyTypeName = h.PropertyType.TypeName,
-                    Squarefeet = h.SquareFeet,
+                    SquareFeet = h.SquareFeet,
                     Price = h.Price,
-                    PhotoUrl = h.HousePhotos.Select(hp => hp.Photo.PhotoURL).ToList()
+                    CoverPhotoUrl = h.HousePhotos.FirstOrDefault(p => p.IsCoverPhoto).Photo.PhotoURL,
+                    FacilityIDs = h.HouseFacilities.Select(f => f.FacilityID).ToList(),
+                    AttributeIDs = h.HouseOtherAttributes.Select(a => a.AttributeID).ToList(),
+                    FavoriteCount = h.Favorites.Count,
+                    CommentCount = h.Comments.Count
                 })
                 .ToListAsync();
 
             return houses;
-        }*/
+        }
 
         public async Task<List<GetHouseDto>> SearchHouses(string? keyword, int propertyTypeID, List<int> facilityIDs, List<int> attributeIDs, int minPrice, int maxPrice)
         {
             var query = _context.Houses.AsQueryable();
 
-            // 根据关键字进行过滤
+            // 根據關鍵字進行過濾
             if (!string.IsNullOrWhiteSpace(keyword))
             {
                 query = query.Where(h => EF.Functions.Like(h.HouseName, $"%{keyword}%") ||
@@ -193,25 +155,13 @@ namespace HouseRentingAPI.Service
                                          EF.Functions.Like(h.Description, $"%{keyword}%"));
             }
 
-            // 根据设施ID进行过滤
-            if (facilityIDs != null && facilityIDs.Any())
-            {
-                query = query.Where(h => h.HouseFacilities.Any(hf => facilityIDs.Contains(hf.FacilityID)));
-            }
-
-            // 根据属性ID进行过滤
-            if (attributeIDs != null && attributeIDs.Any())
-            {
-                query = query.Where(h => h.HouseOtherAttributes.Any(hoa => attributeIDs.Contains(hoa.OtherAttribute.AttributeID)));
-            }
-
-            // 根据 PropertyTypeID 进行过滤
+            // 根據 PropertyTypeID 進行過濾
             if (propertyTypeID > 0)
             {
                 query = query.Where(h => h.PropertyTypeID == propertyTypeID);
             }
 
-            // 根据价格范围进行过滤
+            // 根據價格範圍進行過濾
             if (minPrice > 0)
             {
                 query = query.Where(h => h.Price >= minPrice);
@@ -219,6 +169,18 @@ namespace HouseRentingAPI.Service
             if (maxPrice > 0)
             {
                 query = query.Where(h => h.Price <= maxPrice);
+            }
+
+            // 根據設施ID進行過濾
+            if (facilityIDs != null && facilityIDs.Any())
+            {
+                query = query.Where(h => h.HouseFacilities.Any(hf => facilityIDs.Contains(hf.FacilityID)));
+            }
+
+            // 根據屬性ID進行過濾
+            if (attributeIDs != null && attributeIDs.Any())
+            {
+                query = query.Where(h => h.HouseOtherAttributes.Any(hoa => attributeIDs.Contains(hoa.OtherAttribute.AttributeID)));
             }
 
 
@@ -267,7 +229,7 @@ namespace HouseRentingAPI.Service
             string blobUrl = blobClient.Uri.ToString();
 
             // 將 Blob URL 保存到數據庫中的 Photo 表
-            var photo = new Photo { PhotoURL = blobUrl };
+             var photo = new Photo { PhotoURL = blobUrl };
             _context.Photo.Add(photo);
             await _context.SaveChangesAsync();
 

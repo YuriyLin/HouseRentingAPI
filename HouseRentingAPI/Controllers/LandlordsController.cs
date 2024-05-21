@@ -78,20 +78,16 @@ namespace HouseRentingAPI.Controllers
                 return NotFound();
             }
 
-            var houses = Landlord.Houses.Select(h => new GetHouseByIdDto
+            var houses = Landlord.Houses.Select(h => new GetHouseDto
             {
                 Housename = h.HouseName,
                 Address = h.Address,
-                Description = h.Description,
                 Price = h.Price,
-                Squarefeet = h.SquareFeet,
-                Landlordname = Landlord.Landlordname,
-                lineID = Landlord.LineID,
+                SquareFeet = h.SquareFeet,
                 PropertyTypeName = h.PropertyType.TypeName,
                 FacilityIDs = h.HouseFacilities.Select(f => f.FacilityID).ToList(),
                 AttributeIDs = h.HouseOtherAttributes.Select(a => a.AttributeID).ToList(),
-                Comments = h.Comments.Select(c => c.CommentText).ToList(),
-                PhotoUrl = h.HousePhotos.Select(hp => hp.Photo.PhotoURL).ToList(),
+                CoverPhotoUrl = h.HousePhotos.FirstOrDefault(p => p.IsCoverPhoto).Photo.PhotoURL,
                 CommentCount = h.Comments?.Count ?? 0 ,
                 FavoriteCount = _context.Favorites.Count(f => f.HouseID == h.HouseID)
             }).ToList();

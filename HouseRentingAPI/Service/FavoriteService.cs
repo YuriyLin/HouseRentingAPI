@@ -28,14 +28,21 @@ namespace HouseRentingAPI.Service
                     HouseID = f.House.HouseID,
                     Housename = f.House.HouseName,
                     Address = f.House.Address,
-                    PropertyTypeName = f.House.PropertyType.TypeName, 
-                    SquareFeet = f.House.SquareFeet, 
+                    PropertyTypeName = f.House.PropertyType.TypeName,
+                    SquareFeet = f.House.SquareFeet,
                     Price = f.House.Price,
-                    CoverPhotoUrl = f.House.HousePhotos.FirstOrDefault(p => p.IsCoverPhoto).Photo.PhotoURL, 
-                    FacilityIDs = f.House.HouseFacilities.Select(hf => hf.FacilityID).ToList(),
-                    AttributeIDs = f.House.HouseOtherAttributes.Select(hoa => hoa.OtherAttribute.AttributeID).ToList(),
+                    CoverPhotoUrl = f.House.HousePhotos
+                                   .Where(p => p.IsCoverPhoto)
+                                   .Select(p => p.Photo.PhotoURL)
+                                   .FirstOrDefault(),
+                    FacilityIDs = f.House.HouseFacilities
+                                   .Select(hf => hf.FacilityID)
+                                   .ToList(),
+                    AttributeIDs = f.House.HouseOtherAttributes
+                                   .Select(hoa => hoa.OtherAttribute.AttributeID)
+                                   .ToList(),
                     UserId = f.UserID,
-                    LandlordId = f.House.LandlordID 
+                    LandlordId = f.House.LandlordID
                 })
                 .ToListAsync();
 
