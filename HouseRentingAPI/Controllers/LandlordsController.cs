@@ -80,6 +80,7 @@ namespace HouseRentingAPI.Controllers
 
             var houses = Landlord.Houses.Select(h => new GetHouseDto
             {
+                HouseID = h.HouseID,
                 Housename = h.HouseName,
                 Address = h.Address,
                 Price = h.Price,
